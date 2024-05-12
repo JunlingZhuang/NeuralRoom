@@ -13,3 +13,10 @@ def add_count():
     global global_count
     global_count += 1  
     return jsonify({"count": global_count})
+
+@app.route("/api/generate", methods=["GET"])
+def generate():
+
+    # code for generating model data
+    # return jsonify({"model_data": model_data}), 200
+    return jsonify({"model_data": "model_data"}), 200
