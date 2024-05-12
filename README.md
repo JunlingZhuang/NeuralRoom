@@ -80,7 +80,7 @@ The Flask server will be running on [http://127.0.0.1:5328](http://127.0.0.1:532
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
-
+- [Next.js Flask API framework](https://github.com/wpcodevo/nextjs-flask-framework/tree/main) - learng more about how to set up restful api in the backend
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 - [Flask Documentation](https://flask.palletsprojects.com/en/1.1.x/) - learn about Flask features and API.
