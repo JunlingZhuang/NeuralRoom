@@ -1,8 +1,6 @@
 <p align="center">
-  <a href="https://nextjs-flask-starter.vercel.app/">
-    <img src="public/images/icon.png" alt="Logo" style={{ height: 20 }} />
+    <img src="public/images/icon.png" alt="Logo" style="height: 96px; border-radius: 10px;" />
     <h3 align="center">Neuralroom</h3>
-  </a>
 </p>
 
 <p align="center">Simple Next.js boilerplate that uses <a href="https://flask.palletsprojects.com/">Flask</a> as the API backend.</p>
