@@ -53,6 +53,18 @@ yarn
 pnpm install
 ```
 
+Then, create python virtual env
+
+```bash
+python -m venv venv
+```
+
+In the package.json file, you will start flask server with this venv in 5323 portal
+
+```bash
+"flask-dev": "venv\\Scripts\\pip3 install -r requirements.txt && venv\\Scripts\\python -m flask --app api/index run -p 5328",
+```
+
 Then, run the development server:
 
 ```bash
