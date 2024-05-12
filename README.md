@@ -1,7 +1,7 @@
 <p align="center">
   <a href="https://nextjs-flask-starter.vercel.app/">
-    <img src="https://assets.vercel.com/image/upload/v1588805858/repositories/vercel/logo.png" height="96">
-    <h3 align="center">Next.js Flask Starter</h3>
+    <img src="public/images/icon.png" alt="Logo" style={{ height: 20 }} />
+    <h3 align="center">Neuralroom</h3>
   </a>
 </p>
 
