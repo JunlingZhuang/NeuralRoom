@@ -10,7 +10,7 @@ export default function Home() {
   const handleClick = async () => {
     try {
 
-        // see the next.config.js file for the proxy setting
+      // see the next.config.js file for the proxy setting
       const response = await fetch("/api/test");
       const data = await response.json();
       setCount(data.count);
