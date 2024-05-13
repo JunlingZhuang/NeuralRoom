@@ -38,7 +38,7 @@ export default function Home() {
   };
   const handleGenerateModel = async () => {
     try {
-      // create the request body
+      // create the request body and variables for model generation
       const requestBody = {
         length: 10,
         height: 3,
@@ -61,7 +61,7 @@ export default function Home() {
 
       // handle the response data
       // const modelData = await response.json();
-      // place holder for the model data
+      // placeholder for the model data
       const modelData = "public/models/test.fbx";
     } catch (error) {
       console.error("Error fetching model:", error);
@@ -81,17 +81,16 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div>
-        <div>
-          <Button onClick={handleClick}>Click me</Button>
-          {count !== null && <p>Count: {count}</p>}
-        </div>
-        <div>
-          <Button onClick={handleGenerateModel}>Generate</Button>
-        </div>
-        <div>
-          <Button onClick={handleDownloadModel}>Download</Button>
-        </div>
+      <div className="flex flex-col items-center justify-between ">
+        <p>Counter to test if Flask API Works</p>
+        <Button onClick={handleClick}>Click me</Button>
+        {count !== null && <p>Count: {count}</p>}
+        <br />
+        <p>Test Model Geration Function</p>
+        <p>1.Clickon Generate</p>
+        <p>2.Dowonload Model to see if it works</p>
+        <Button onClick={handleGenerateModel}>Generate</Button>
+        <Button onClick={handleDownloadModel}>Download</Button>
       </div>
     </main>
   );
