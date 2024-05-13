@@ -58,7 +58,7 @@ export default function Home() {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
+      //test
       // handle the response data
       // const modelData = await response.json();
       // placeholder for the model data
