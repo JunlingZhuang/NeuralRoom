@@ -1,5 +1,3 @@
-// page.tsx
-
 "use client";
 import { Button } from "@nextui-org/button";
 
@@ -68,19 +66,21 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching model:", error);
     }
+  };
 
-    const handleClick = async () => {
-      try {
-        // see the next.config.js file for the proxy setting
-        const response = await fetch("/api/test");
-        const data = await response.json();
-        setCount(data.count);
-      } catch (error) {
-        console.error("Failed to fetch count:", error);
-      }
-    };
+  const handleClick = async () => {
+    try {
+      // see the next.config.js file for the proxy setting
+      const response = await fetch("/api/test");
+      const data = await response.json();
+      setCount(data.count);
+    } catch (error) {
+      console.error("Failed to fetch count:", error);
+    }
+  };
 
-    return (
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div>
         <div>
           <Button onClick={handleClick}>Click me</Button>
@@ -93,6 +93,6 @@ export default function Home() {
           <Button onClick={handleDownloadModel}>Download</Button>
         </div>
       </div>
-    );
-  };
+    </main>
+  );
 }
