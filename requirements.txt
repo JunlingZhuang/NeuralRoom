@@ -1,17 +1,17 @@
-cloudpickle==0.5.3
+# cloudpickle==0.5.3
 Flask==3.0.1
-graphviz==0.20.1
-mapbox_earcut==1.0.1
-matplotlib==3.7.1
-numpy==1.26.0
-plotly==5.18.0
-psutil==5.9.8
-pyyaml==5.1.2
-rtree==1.2.0
-scipy==1.11.2
-shapely==2.0.3
-trimesh==4.1.0
-wheel==0.33.6
-torch
-torchvision
-torchaudio
+# graphviz==0.20.1
+# mapbox_earcut==1.0.1
+# matplotlib==3.7.1
+# numpy==1.26.0
+# plotly==5.18.0
+# psutil==5.9.8
+# pyyaml==5.1.2
+# rtree==1.2.0
+# scipy==1.11.2
+# shapely==2.0.3
+# trimesh==4.1.0
+# wheel==0.33.6
+# torch
+# torchvision
+# torchaudio
