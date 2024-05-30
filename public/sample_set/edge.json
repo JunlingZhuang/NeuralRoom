@@ -1,0 +1,10 @@
+[
+  { "type": 1, "source": 2, "target": 5 },
+  { "type": 1, "source": 2, "target": 4 },
+  { "type": 1, "source": 5, "target": 4 },
+  { "type": 3, "source": 3, "target": 1 },
+  { "type": 3, "source": 3, "target": 0 },
+  { "type": 2, "source": 5, "target": 3 },
+  { "type": 2, "source": 2, "target": 3 },
+  { "type": 2, "source": 4, "target": 3 }
+]
