@@ -6,7 +6,7 @@ global_count = 0
 
 @app.route("/api/python")
 def hello_world():
-    return "<p>Hello, World!</p>"
+    return "<p>Hello, World!!</p>"
 
 @app.route("/api/test", methods=["GET"])
 def add_count():
