@@ -1,0 +1,1 @@
+// some frequently use function(mathematically calculation )

@@ -1,4 +1,9 @@
 @tailwind base;
+@layer base {
+  html {
+    @apply text-white;
+  }
+}
 @tailwind components;
 @tailwind utilities;
 
@@ -18,10 +23,15 @@
 
 body {
   color: rgb(var(--foreground-rgb));
+  background-color: black; /* 将背景颜色设置为黑色 */
+}
+
+/* body {
+  color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
       transparent,
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
-}
+} */

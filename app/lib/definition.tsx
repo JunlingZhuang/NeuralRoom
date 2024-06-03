@@ -1,0 +1,1 @@
+// store the type/interface definition
