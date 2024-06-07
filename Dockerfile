@@ -58,4 +58,4 @@ COPY --from=build-step /workspace/api ./api
 EXPOSE 3000 5328
 
 # Start both the Next.js and Flask server
-CMD ["sh", "-c", "pnpm start & python api/index.py"]
+CMD ["sh", "-c", "npx next start & python api/index.py"]
