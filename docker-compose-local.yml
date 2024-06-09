@@ -1,14 +1,18 @@
 version: '3.8'
 services:
-  beanstalk-nextjs:
-    image: shuhanmomo/nextjs:latest
+  nextjs:
+    build:
+      context: .
+      dockerfile: node.Dockerfile
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
 
-  beanstalk-flask:
-    image: shuhanmomo/flask:latest
+  flask:
+    build:
+      context: .
+      dockerfile: flask.Dockerfile
     ports:
       - "5328:5328"
     environment:
