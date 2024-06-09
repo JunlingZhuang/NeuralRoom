@@ -18,6 +18,9 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
+# Install gunicorn
+RUN pip install gunicorn
+
 # Copy Flask application
 COPY api ./api
 
@@ -25,4 +28,5 @@ ENV FLASK_ENV production
 
 EXPOSE 5328
 
-CMD ["python", "api/index.py"]
+# Start the Flask server using gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:5328", "api.index:app"]
