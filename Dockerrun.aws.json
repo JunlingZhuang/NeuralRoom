@@ -1,0 +1,29 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions": [
+        {
+            "name": "nextjs",
+            "image": "shuhanmomo/nextjs:latest",
+            "essential": true,
+            "memory": 512,
+            "portMappings": [
+                {
+                    "hostPort": 3000,
+                    "containerPort": 3000
+                }
+            ]
+        },
+        {
+            "name": "flask",
+            "image": "shuhanmomo/flask:latest",
+            "essential": true,
+            "memory": 512,
+            "portMappings": [
+                {
+                    "hostPort": 5328,
+                    "containerPort": 5328
+                }
+            ]
+        }
+    ]
+}
