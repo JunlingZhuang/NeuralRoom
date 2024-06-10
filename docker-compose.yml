@@ -1,13 +1,13 @@
 version: '3.8'
 services:
-  beanstalk-nextjs:
+  nextjs:
     image: shuhanmomo/nextjs:latest
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
 
-  beanstalk-flask:
+  flask:
     image: shuhanmomo/flask:latest
     ports:
       - "5328:5328"
