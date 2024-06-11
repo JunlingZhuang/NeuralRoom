@@ -3,13 +3,28 @@ services:
   nextjs:
     image: shuhanmomo/nextjs:latest
     ports:
-      - "3000:3000"
+      - "80:3000"
     environment:
       - NODE_ENV=production
+    networks:
+      - frontend
+    depends_on:
+      - flask
 
   flask:
     image: shuhanmomo/flask:latest
-    ports:
-      - "5328:5328"
+    expose:
+      - "5328"
     environment:
       - FLASK_ENV=production
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5328/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  frontend:
+  backend:
