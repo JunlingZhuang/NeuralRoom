@@ -1,0 +1,56 @@
+name: Deploy App to AWS
+
+on:
+  push:
+    branches:
+      - aws_deploy_test
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push Next.js image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/nextjs:latest -f node.Dockerfile .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/nextjs:latest
+
+      - name: Build and push Flask image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/flask:latest -f flask.Dockerfile .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/flask:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Generate deployment package
+        run: zip -r deploy.zip . -x '*.git*'
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: neural-room-deploy-test
+          environment_name: Neural-room-deploy-test-env
+          version_label: ${{ github.sha }}
+          existing_bucket_name: elasticbeanstalk-us-east-2-590183697706
+          region: ${{ secrets.AWS_REGION }}
+          deployment_package: deploy.zip
