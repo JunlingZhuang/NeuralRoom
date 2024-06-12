@@ -6,7 +6,7 @@ WORKDIR /workspace
 ENV PATH /workspace/node_modules/.bin:$PATH
 
 # Copy package info
-COPY pnpm-lock.yaml package.json ./
+COPY package.json ./
 
 # Install pnpm
 RUN npm install -g pnpm
