@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   nextjs:
-    image: shuhanmomo/nextjs:latest
+    image: neuralroom/nextjs:latest
     ports:
       - "80:3000"
     environment:
@@ -13,7 +13,7 @@ services:
       - flask
 
   flask:
-    image: shuhanmomo/flask:latest
+    image: neuralroom/flask:latest
     expose:
       - "5328"
     environment:
