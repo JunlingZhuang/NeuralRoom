@@ -3,7 +3,7 @@ name: Deploy App to AWS
 on:
   push:
     branches:
-      - aws_deploy_test
+      - main
 
 jobs:
   build:
