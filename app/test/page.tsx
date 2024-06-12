@@ -38,6 +38,7 @@ export default function Home() {
   };
   const handleGenerateModel = async () => {
     try {
+      // create the request body
       // create the request body and variables for model generation
       const requestBody = {
         length: 10,
@@ -58,9 +59,10 @@ export default function Home() {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      //test
+
       // handle the response data
       // const modelData = await response.json();
+      // place holder for the model data
       // placeholder for the model data
       const modelData = "public/models/test.fbx";
     } catch (error) {
