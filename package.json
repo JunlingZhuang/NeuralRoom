@@ -13,6 +13,8 @@
   "dependencies": {
     "@nextui-org/button": "^2.0.33",
     "@nextui-org/react": "^2.3.6",
+    "@nextui-org/system": "2.2.1",
+    "@nextui-org/theme": "2.2.5",
     "@react-three/drei": "^9.106.0",
     "@react-three/fiber": "^8.16.7",
     "@types/node": "20.1.4",
