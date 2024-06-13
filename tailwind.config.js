@@ -23,6 +23,7 @@ module.exports = {
       yellow: colors.yellow,
       "panel-bg": "#202124",
       "panel-border": "#4E4E4E",
+      "main-blue": "#46A8E5",
     },
     extend: {
       backgroundImage: {
@@ -43,7 +44,7 @@ module.exports = {
               foreground: "#000000",
             },
             secondary: {
-              DEFAULT: "#202124",
+              DEFAULT: "#686868",
               foreground: "#FFFFFF",
             },
             focus: "#BEF264",
