@@ -1,11 +1,8 @@
-version: "3.9"
+version: '3.8'
 
 services:
   nextjs:
-    build:
-      context: .
-      dockerfile: Dockerfile-nextjs
-    # image: shuhanmomo/nextjs:latest
+    image: neuralroom/nextjs:latest
     ports:
       - "80:3000"
     environment:
@@ -16,10 +13,7 @@ services:
       - flask
 
   flask:
-    build:
-      context: .
-      dockerfile: Dockerfile-flask
-    # image: shuhanmomo/flask:latest
+    image: neuralroom/flask:latest
     expose:
       - "5328"
     environment:
