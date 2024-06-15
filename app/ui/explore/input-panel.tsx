@@ -8,7 +8,8 @@ import UserProfilePanel from "@/app/ui/explore/user-profile-panel";
 
 export default function InputPanel() {
   const [activePanel, setActivePanel] = useState("graph");
-
+  const [userprofile, setUserprofile] = useState();
+  
   const renderPanelContent = () => {
     switch (activePanel) {
       case "user":

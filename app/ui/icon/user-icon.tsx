@@ -34,7 +34,7 @@ const UserIcon: React.FC<UserIconProps> = ({
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeMiterlimit={10}
-        strokeWidth={1.5}
+        strokeWidth={1}
       >
         <path
           data-name="Stroke 1"

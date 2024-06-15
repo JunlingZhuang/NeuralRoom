@@ -24,6 +24,7 @@ module.exports = {
       "panel-bg": "#202124",
       "panel-border": "#4E4E4E",
       "main-blue": "#46A8E5",
+      "input-bg": "202020",
     },
     extend: {
       backgroundImage: {
