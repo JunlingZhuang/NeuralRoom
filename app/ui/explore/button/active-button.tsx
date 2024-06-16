@@ -4,7 +4,7 @@ import React from "react";
 import { Button } from "@nextui-org/react";
 import classNames from "classnames";
 
-interface CustomButtonProps {
+interface CustomTabButtonProps {
   color: "default" | "primary" | "secondary" | "success" | "warning" | "danger";
   variant:
     | "light"
@@ -20,6 +20,7 @@ interface CustomButtonProps {
   onClick: () => void;
   children: React.ReactNode;
   ariaLabel: string;
+  borderWidth?: number; 
 }
 
 export default function CustomButton({
@@ -31,12 +32,14 @@ export default function CustomButton({
   onClick,
   children,
   ariaLabel,
-}: CustomButtonProps) {
+  borderWidth,
+}: CustomTabButtonProps) {
   return (
     <Button
       isIconOnly
       className={classNames(
-        isActive ? "bg-main-blue border-black ring-4 ring-main-blue" : ""
+        isActive ? "bg-main-blue ring-4 ring-main-blue border-black" : "",
+        borderWidth ? `border-${borderWidth}` : "" 
       )}
       color={color}
       variant={variant}
@@ -44,6 +47,7 @@ export default function CustomButton({
       radius={radius}
       size={size}
       onClick={onClick}
+      style={{ borderWidth: borderWidth }} 
     >
       {React.cloneElement(children as React.ReactElement, {
         className: classNames(

@@ -1,0 +1,15 @@
+[
+  { "key": "young_professional", "label": "Young Professional" },
+  { "key": "family_with_kids", "label": "Family with Kids" },
+  { "key": "retiree", "label": "Retiree" },
+  { "key": "student", "label": "Student" },
+  { "key": "single_professional", "label": "Single Professional" },
+  { "key": "newly_wed", "label": "Newly Wed" },
+  { "key": "remote_worker", "label": "Remote Worker" },
+  { "key": "empty_nester", "label": "Empty Nester" },
+  { "key": "couple_no_kids", "label": "Couple without Kids" },
+  { "key": "pet_owner", "label": "Pet Owner" },
+  { "key": "multigenerational_family", "label": "Multigenerational Family" },
+  { "key": "luxury_seeker", "label": "Luxury Seeker" },
+  { "key": "first_time_buyer", "label": "First Time Buyer" }
+]

@@ -1,7 +1,6 @@
-import { nextui } from "@nextui-org/react";
-
-// use default theme and can add customized color pairs
+const plugin = require("tailwindcss/plugin");
 const colors = require("tailwindcss/colors");
+const { nextui } = require("@nextui-org/react");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -24,6 +23,7 @@ module.exports = {
       "panel-bg": "#202124",
       "panel-border": "#4E4E4E",
       "main-blue": "#46A8E5",
+      inputBackGround: "#202020",
     },
     extend: {
       backgroundImage: {
@@ -51,6 +51,17 @@ module.exports = {
           },
         },
       },
+    }),
+    plugin(function ({ addUtilities }) {
+      addUtilities({
+        ".custom-input-wrapper": {
+          "@apply shadow-xl bg-inputBackGround backdrop-blur-xl backdrop-saturate-200 cursor-text":
+            {},
+          "@apply dark:bg-inputBackGround/60": {},
+          "@apply dark:hover:bg-inputBackGround/70": {},
+          "@apply dark:focus:bg-inputBackGround/80": {},
+        },
+      });
     }),
   ],
 };
