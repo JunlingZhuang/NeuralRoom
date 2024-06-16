@@ -38,6 +38,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    environment:
+      name: production
+      url: http://neural-room-deploy-test-env.eba-uwku7g9u.us-east-2.elasticbeanstalk.com/
 
     steps:
       - name: Checkout source code
