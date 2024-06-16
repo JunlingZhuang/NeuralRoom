@@ -4,7 +4,7 @@ import React from "react";
 import { Button } from "@nextui-org/react";
 import classNames from "classnames";
 
-interface CustomButtonProps {
+interface CustomTabButtonProps {
   color: "default" | "primary" | "secondary" | "success" | "warning" | "danger";
   variant:
     | "light"
@@ -33,7 +33,7 @@ export default function CustomButton({
   children,
   ariaLabel,
   borderWidth,
-}: CustomButtonProps) {
+}: CustomTabButtonProps) {
   return (
     <Button
       isIconOnly

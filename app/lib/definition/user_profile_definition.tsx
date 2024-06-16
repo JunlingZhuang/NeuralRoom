@@ -1,4 +1,3 @@
-// types/userProfile.ts
 export type UserProfile = {
   userPersona: string;
   bedroomNum: number;
@@ -41,7 +40,7 @@ export const createUserProfile = (
   };
 };
 
-// 更新函数
+// update user profile
 export const updateUserProfile = (
   userProfile: UserProfile,
   updates: Partial<UserProfile>
@@ -62,7 +61,13 @@ export const updateUserProfile = (
   };
 };
 
-// 定义组件属性类型
+// define user profile props
 export type UserProfileDefinitionProps = {
   userProfile: UserProfile;
 };
+
+export type UserProfilePersonaOptionProps = {
+  key: string;
+  label: string;
+}
+
