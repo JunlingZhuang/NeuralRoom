@@ -2,13 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { useBoxSize } from "@/app/lib/context/BoxSizeContext";
+import { useGeneration } from "@/app/lib/context/generationContext";
 import { Group } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
 export default function ThreeCanvas() {
-  const { boxSizeManager, model } = useBoxSize();
-  const boxSize = boxSizeManager.getSize();
+  const { modelManager, model } = useGeneration();
+  const boxSize = modelManager.getSize();
   const [fbxModel, setFbxModel] = useState<Group | null>(null);
 
   useEffect(() => {
