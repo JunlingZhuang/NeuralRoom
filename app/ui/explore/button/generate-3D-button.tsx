@@ -5,12 +5,16 @@ import CustomGenerateButton from "@/app/ui/explore/button/generate-button";
 
 interface Generate3DButtonProps {
   onClick: () => void;
+  isLoading: boolean;
 }
 
-export default function Generate3DButton({ onClick }: Generate3DButtonProps) {
+export default function Generate3DButton({
+  onClick,
+  isLoading,
+}: Generate3DButtonProps) {
   return (
     <CustomGenerateButton
-      isLoading={false}
+      isLoading={isLoading}
       color="primary"
       variant="solid"
       radius="right-full"
