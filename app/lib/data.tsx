@@ -27,3 +27,17 @@ export async function fetchUserProfilePersonaOptions(): Promise<
   }
   return await response.json();
 }
+
+// data.tsx
+export const generate3DModel = async (boxSize: {
+  length: number;
+  width: number;
+  height: number;
+}) => {
+  try {
+    return "test.fbx";
+  } catch (error) {
+    console.error("Error generating 3D model:", error);
+    throw error;
+  }
+};
