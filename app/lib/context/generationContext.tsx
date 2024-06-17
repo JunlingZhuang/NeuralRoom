@@ -1,8 +1,14 @@
 "use client";
 
 import React, { createContext, useContext, ReactNode, useState } from "react";
-import { ModelManager, createModelManager } from "@/app/lib/class/modelManager";
-import { GraphManager, createGraphManager } from "@/app/lib/class/graphManager";
+import {
+  ModelManager,
+  createModelManager,
+} from "@/app/lib/manager/modelManager";
+import {
+  GraphManager,
+  createGraphManager,
+} from "@/app/lib/manager/graphManager";
 
 type GenerationManager = {
   modelManager: ModelManager;
