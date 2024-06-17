@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Slider } from "@nextui-org/react";
 import { useGenerationManager } from "@/app/lib/context/generationContext";
-import { BoundingBoxSize } from "@/app/lib/definition/general-definition";
+import { BoundingBoxSize } from "@/app/lib/class/modelManager";
 
 interface SizeSliderProps {
   maxValue?: number;
