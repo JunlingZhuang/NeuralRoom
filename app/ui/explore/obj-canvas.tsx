@@ -2,21 +2,22 @@
 import React, { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { useBoxSize } from "@/app/lib/context/BoxSizeContext";
+import { useGenerationManager } from "@/app/lib/context/generationContext";
 import { Group } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
 export default function ThreeCanvas() {
-  const { boxSizeManager, model } = useBoxSize();
-  const boxSize = boxSizeManager.getSize();
+  const { modelManager } = useGenerationManager();
+  const boxSize = modelManager.boundingBoxSize;
   const [fbxModel, setFbxModel] = useState<Group | null>(null);
+  const currentModel = modelManager.model;
 
   useEffect(() => {
-    if (model) {
+    if (currentModel) {
       const loadModel = async () => {
         try {
           const loader = new FBXLoader();
-          const loadedModel = await loader.loadAsync(`/models/${model}`);
+          const loadedModel = await loader.loadAsync(`/models/${currentModel}`);
           setFbxModel(loadedModel);
         } catch (error) {
           console.error("Error loading model:", error);
@@ -26,7 +27,7 @@ export default function ThreeCanvas() {
     } else {
       setFbxModel(null); // 如果 model 不存在，确保 fbxModel 为 null
     }
-  }, [model]);
+  }, [currentModel]);
 
   return (
     <Canvas

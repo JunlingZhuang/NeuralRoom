@@ -1,14 +1,14 @@
 import ThreeCanvas from "@/app/ui/explore/obj-canvas";
 import InputPanel from "@/app/ui/explore/input-panel";
-import { BoxSizeProvider } from "@/app/lib/context/BoxSizeContext";
+import { GenerationManagerProvider } from "@/app/lib/context/generationContext";
 
 export default async function Page() {
   return (
-    <BoxSizeProvider>
+    <GenerationManagerProvider>
       <div className="h-full relative">
         <ThreeCanvas />
         <InputPanel />
       </div>
-    </BoxSizeProvider>
+    </GenerationManagerProvider>
   );
 }

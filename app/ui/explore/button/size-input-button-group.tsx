@@ -1,27 +1,24 @@
 import React, { useState } from "react";
 import SizeSlider from "@/app/ui/explore/button/size-slider";
 import { Button } from "@nextui-org/react";
-import CustomTabButton from "@/app/ui/explore/button/active-button";
 import Generate3DButton from "@/app/ui/explore/button/generate-3D-button";
-import { useBoxSize } from "@/app/lib/context/BoxSizeContext";
+import { useGenerationManager } from "@/app/lib/context/generationContext";
 import { generate3DModel } from "@/app/lib/data";
 
 export default function SizeInputButtonGroup() {
-  const { boxSizeManager, setModel } = useBoxSize();
-  const currentBoxSize = boxSizeManager.getSize();
+  const { modelManager } = useGenerationManager();
+  const currentBoxSize = modelManager.boundingBoxSize;
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGenerate3DModel = async () => {
     setIsLoading(true);
     try {
-      // 模拟等待两秒钟
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // 这里你可以添加其他逻辑，例如调用后端 API
       const modelPath = await generate3DModel(currentBoxSize);
       console.log("3D model generated:", modelPath);
 
-      setModel(modelPath); // 更新模型数据
+      modelManager.updateModel(modelPath);
     } catch (error) {
       console.error("Failed to generate 3D model:", error);
     } finally {
