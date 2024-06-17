@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import SizeSlider from "@/app/ui/explore/button/size-slider";
 import { Button } from "@nextui-org/react";
 import Generate3DButton from "@/app/ui/explore/button/generate-3D-button";
-import { useGeneration } from "@/app/lib/context/generationContext";
+import { useGenerationManager } from "@/app/lib/context/generationContext";
 import { generate3DModel } from "@/app/lib/data";
 
 export default function SizeInputButtonGroup() {
-  const { modelManager, setModel } = useGeneration();
-  const currentBoxSize = modelManager.getSize();
+  const { modelManager } = useGenerationManager();
+  const currentBoxSize = modelManager.boundingBoxSize;
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGenerate3DModel = async () => {
@@ -18,7 +18,7 @@ export default function SizeInputButtonGroup() {
       const modelPath = await generate3DModel(currentBoxSize);
       console.log("3D model generated:", modelPath);
 
-      setModel(modelPath);
+      modelManager.updateModel(modelPath);
     } catch (error) {
       console.error("Failed to generate 3D model:", error);
     } finally {

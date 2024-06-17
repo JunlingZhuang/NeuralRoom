@@ -1,29 +1,74 @@
-
 "use client";
+import React, { useState } from "react";
 
-import { BoundingBoxSize } from "@/app/lib/definition/general-definition";
+import { init } from "next/dist/compiled/webpack/webpack";
 
-export class ModelManager {
-  private boundingboxSize: BoundingBoxSize;
-  private updateCallback: (boundingboxSize: BoundingBoxSize) => void;
+export type BoundingBoxSize = {
+  length: number;
+  width: number;
+  height: number;
+};
 
-  constructor(
-    initialSize: BoundingBoxSize,
-    updateCallback: (boxSize: BoundingBoxSize) => void
-  ) {
-    this.boundingboxSize = initialSize;
-    this.updateCallback = updateCallback;
-  }
+export type BottomCenterPoint = {
+  x: number;
+  y: number;
+  z: number;
+};
 
-  updateSize(newPartialBoundingBoxSize: Partial<BoundingBoxSize>) {
-    this.boundingboxSize = {
-      ...this.boundingboxSize,
-      ...newPartialBoundingBoxSize,
-    };
-    this.updateCallback(this.boundingboxSize);
-  }
+export type ModelManager = {
+  model: string | null;
+  boundingBoxSize: BoundingBoxSize;
+  floorNum: number;
+  bottomCenterPoint: BottomCenterPoint;
+  updateModel: (model: string | null) => void;  
+  updateBoundingBoxSize: (boundingBoxSize: BoundingBoxSize) => void;
+  updateFloorNum: (floorNum: number) => void;
+  updateBottomCenterPoint: (bottomCenterPoint: BottomCenterPoint) => void;
+};
 
-  getSize() {
-    return this.boundingboxSize;
-  }
-}
+export const createModelManager = (
+  initialModel: string | null,
+  initialBoundingBoxSize: BoundingBoxSize,
+  initialFloorNum: number,
+  initialBottomCenterPoint: BottomCenterPoint
+): ModelManager => {
+  const [boundingBoxSize, setBoundingBoxSize] = useState<BoundingBoxSize>(
+    initialBoundingBoxSize
+  );
+
+  const [model, setModel] = useState<string | null>(initialModel);
+  const [floorNum, setFloorNum] = useState<number>(initialFloorNum);
+  const [bottomCenterPoint, setBottomCenterPoint] = useState<BottomCenterPoint>(
+    initialBottomCenterPoint
+  );
+
+  const updateModel = (model: string | null) => {
+    setModel(model);
+  };
+  const updateBoundingBoxSize = (
+    partialBoundingBoxSize: Partial<BoundingBoxSize>
+  ) => {
+    setBoundingBoxSize((prevBoundingBoxSize) => ({
+      ...prevBoundingBoxSize,
+      ...partialBoundingBoxSize,
+    }));
+  };
+  const updateFloorNum = (newFloorNum: number) => {
+    setFloorNum(newFloorNum);
+  };
+
+  const updateBottomCenterPoint = (newBottomCenterPoint: BottomCenterPoint) => {
+    setBottomCenterPoint(newBottomCenterPoint);
+  };
+
+  return {
+    model,
+    boundingBoxSize,
+    floorNum,
+    bottomCenterPoint,
+    updateModel,
+    updateBoundingBoxSize,
+    updateFloorNum,
+    updateBottomCenterPoint,
+  };
+};

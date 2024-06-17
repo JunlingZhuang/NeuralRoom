@@ -1,47 +1,57 @@
 "use client";
 
 import React, { createContext, useContext, ReactNode, useState } from "react";
-import { ModelManager } from "@/app/lib/class/modelManager";
-import { BoundingBoxSize } from "@/app/lib/definition/general-definition";
+import { ModelManager, createModelManager } from "@/app/lib/class/modelManager";
+import { GraphManager, createGraphManager } from "@/app/lib/class/graphManager";
 
-type GenerationContextProps = {
+type GenerationManager = {
   modelManager: ModelManager;
-  model: string | null;
-  setModel: (model: string | null) => void;
+  graphManager: GraphManager;
 };
 
-const GenerationContext = createContext<GenerationContextProps | undefined>(
+const GenerationManagerContext = createContext<GenerationManager | undefined>(
   undefined
 );
 
-export const useGeneration = () => {
-  const context = useContext(GenerationContext);
-  if (!context) {
-    throw new Error("useBoxSize must be used within a GenerationProvider");
-  }
-  return context;
-};
-
-type GenerationProviderProps = {
-  children: ReactNode;
-};
-
-export const GenerationProvider: React.FC<GenerationProviderProps> = ({
+export const GenerationManagerProvider = ({
   children,
+}: {
+  children: ReactNode;
 }) => {
-  const [boxSize, setBoxSize] = useState<BoundingBoxSize>({
-    length: 20,
-    width: 20,
-    height: 1,
-  });
-  const [model, setModel] = useState<string | null>(null);
-  const modelManager = new ModelManager(boxSize, setBoxSize);
+  const initialBoundingBoxSize = { length: 10, width: 5, height: 3 };
+  const initialFloorNum = 1;
+  const initialBottomCenterPoint = { x: 0, y: 0, z: 0 };
+  const initialModel = null;
+
+  const modelManager = createModelManager(
+    initialModel,
+    initialBoundingBoxSize,
+    initialFloorNum,
+    initialBottomCenterPoint
+  );
+
+  const initialGraph = {
+    Nodes: [{ id: "node1" }],
+    Edges: [],
+  };
+
+  const graphManager = createGraphManager(initialGraph);
+
+  const generationManager = { modelManager, graphManager };
 
   return (
-    <GenerationContext.Provider
-      value={{ modelManager: modelManager, model, setModel }}
-    >
+    <GenerationManagerContext.Provider value={generationManager}>
       {children}
-    </GenerationContext.Provider>
+    </GenerationManagerContext.Provider>
   );
+};
+
+export const useGenerationManager = (): GenerationManager => {
+  const context = useContext(GenerationManagerContext);
+  if (context === undefined) {
+    throw new Error(
+      "useGenerationManager must be used within a GenerationManagerProvider"
+    );
+  }
+  return context;
 };

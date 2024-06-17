@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Slider } from "@nextui-org/react";
-import { useGeneration } from "@/app/lib/context/generationContext";
+import { useGenerationManager } from "@/app/lib/context/generationContext";
 import { BoundingBoxSize } from "@/app/lib/definition/general-definition";
 
 interface SizeSliderProps {
@@ -15,15 +15,15 @@ const SizeSlider: React.FC<SizeSliderProps> = ({
   label,
 }) => {
   const [sliderValue, setSliderValue] = useState<number>(initialValue);
-  const { modelManager, setModel } = useGeneration(); // Get setModel from context
+  const { modelManager } = useGenerationManager();
 
   const handleChange = (sliderValue: number | number[]) => {
     if (typeof sliderValue !== "number") return;
     setSliderValue(sliderValue);
     const newBoundingBoxSize = { [label]: sliderValue };
-    modelManager.updateSize(newBoundingBoxSize as Partial<BoundingBoxSize>);
-    setModel(null); // Set model to null to trigger box rendering
-    console.log("Updated box size:", modelManager.getSize()); // Add a console log to verify updates
+    modelManager.updateBoundingBoxSize(newBoundingBoxSize as BoundingBoxSize);
+    modelManager.updateModel(null); // Set model to null to trigger box rendering
+    console.log("Updated box size:", modelManager.boundingBoxSize); // Add a console log to verify updates
   };
 
   return (
