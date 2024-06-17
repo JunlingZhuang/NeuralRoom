@@ -1,7 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 
-import { init } from "next/dist/compiled/webpack/webpack";
 
 export type BoundingBoxSize = {
   length: number;
