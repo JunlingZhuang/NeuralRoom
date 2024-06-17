@@ -1,5 +1,5 @@
-import { ModelManager } from "@/app/lib/class/modelManager";
-import { GraphManager } from "@/app/lib/class/graphManager";
+import { ModelManager } from "@/app/lib/manager/modelManager";
+import { GraphManager } from "@/app/lib/manager/graphManager";
 
 // type GenerationContextProps = {
 //   modelManager: ModelManager;
