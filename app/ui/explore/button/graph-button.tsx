@@ -2,7 +2,7 @@
 
 import React from "react";
 import UserIcon from "@/app/ui/icon/user-icon";
-import CustomTabButton from "@/app/ui/explore/button/active-button";
+import CustomActiveButton from "@/app/ui/explore/button/base-type/active-button";
 import { GoScreenFull } from "react-icons/go";
 
 export default function GraphButton({
@@ -15,7 +15,7 @@ export default function GraphButton({
   borderWidth?: number;
 }) {
   return (
-    <CustomTabButton
+    <CustomActiveButton
       color="secondary"
       variant="bordered"
       radius="full"
@@ -26,6 +26,6 @@ export default function GraphButton({
       borderWidth={borderWidth}
     >
       <GoScreenFull className="stroke-0.5 size-20" />
-    </CustomTabButton>
+    </CustomActiveButton>
   );
 }

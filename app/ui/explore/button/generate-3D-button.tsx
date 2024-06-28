@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { BsBox } from "react-icons/bs";
-import CustomGenerateButton from "@/app/ui/explore/button/generate-button";
+import CustomGenerateButton from "@/app/ui/explore/button/base-type/generate-button";
 
 interface Generate3DButtonProps {
   onClick: () => void;

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import SizeSlider from "@/app/ui/explore/button/size-slider";
+import SizeSlider from "@/app/ui/explore/button/base-type/size-slider";
 import { Button } from "@nextui-org/react";
 import Generate3DButton from "@/app/ui/explore/button/generate-3D-button";
 import { useGenerationManager } from "@/app/lib/context/generationContext";
 import { generate3DModel } from "@/app/lib/data";
 import { generate3DModel_Backend } from "@/app/lib/data";
+
 export default function SizeInputButtonGroup() {
   const { modelManager } = useGenerationManager();
   const { graphManager } = useGenerationManager();

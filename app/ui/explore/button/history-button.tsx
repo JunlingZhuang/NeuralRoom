@@ -3,7 +3,7 @@
 import { BsClockHistory } from "react-icons/bs";
 import React from "react";
 import UserIcon from "@/app/ui/icon/user-icon";
-import CustomButton from "@/app/ui/explore/button/active-button";
+import CustomActiveButton from "@/app/ui/explore/button/base-type/active-button";
 
 export default function HistoryButton({
   isActive,
@@ -15,7 +15,7 @@ export default function HistoryButton({
   borderWidth: number;
 }) {
   return (
-    <CustomButton
+    <CustomActiveButton
       color="secondary"
       variant="bordered"
       radius="full"
@@ -26,6 +26,6 @@ export default function HistoryButton({
       borderWidth={borderWidth}
     >
       <BsClockHistory className="stroke-0.5 size-10" />
-    </CustomButton>
+    </CustomActiveButton>
   );
 }
