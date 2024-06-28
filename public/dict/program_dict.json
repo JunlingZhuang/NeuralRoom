@@ -1,0 +1,22 @@
+{
+  "0": { "index": 0, "color": "#D5D5D5", "programName": "_unit_" },
+  "1": { "index": 1, "color": "#B2C193", "programName": "balcony" },
+  "2": { "index": 2, "color": "#CACACA", "programName": "bathroom" },
+  "3": { "index": 3, "color": "#fed9ed", "programName": "bed" },
+  "4": { "index": 4, "color": "#B29494", "programName": "bedroom" },
+  "5": { "index": 5, "color": "#627DA5", "programName": "cabinet" },
+  "6": { "index": 6, "color": "#B7AFD0", "programName": "chair" },
+  "7": { "index": 7, "color": "#B2C193", "programName": "circulation" },
+  "8": { "index": 8, "color": "#B2C193", "programName": "courtyard" },
+  "9": { "index": 9, "color": "#79D4BC", "programName": "desk" },
+  "10": { "index": 10, "color": "#BAB8E2", "programName": "diningroom" },
+  "11": { "index": 11, "color": "#94CDE9", "programName": "kitchen" },
+  "12": { "index": 12, "color": "#B6E3C4", "programName": "library" },
+  "13": { "index": 13, "color": "#978BA0", "programName": "livingroom" },
+  "14": { "index": 14, "color": "#8ddfcb", "programName": "nightstand" },
+  "15": { "index": 15, "color": "#CACACA", "programName": "service" },
+  "16": { "index": 16, "color": "#ea9999", "programName": "sofa" },
+  "17": { "index": 17, "color": "#CACACA", "programName": "storage" },
+  "18": { "index": 18, "color": "#F0A5A5", "programName": "table" },
+  "19": { "index": 19, "color": "#627DA5", "programName": "wardrobe" }
+}

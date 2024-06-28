@@ -23,13 +23,14 @@ const SizeSlider: React.FC<SizeSliderProps> = ({
     const newBoundingBoxSize = { [label]: sliderValue };
     modelManager.updateBoundingBoxSize(newBoundingBoxSize as BoundingBoxSize);
     modelManager.updateModel(null); // Set model to null to trigger box rendering
-    console.log("Updated box size:", modelManager.boundingBoxSize); // Add a console log to verify updates
+    // console.log("Updated box size:", modelManager.boundingBoxSize); // Add a console log to verify updates
   };
 
   return (
     <div className="flex flex-row items-center gap-4 w-full max-w-md">
       <div className="text-sm">{label}</div>
       <Slider
+        aria-label="size-slider"
         showTooltip={true}
         size="sm"
         defaultValue={initialValue}

@@ -4,21 +4,42 @@ import { Button } from "@nextui-org/react";
 import Generate3DButton from "@/app/ui/explore/button/generate-3D-button";
 import { useGenerationManager } from "@/app/lib/context/generationContext";
 import { generate3DModel } from "@/app/lib/data";
-
+import { generate3DModel_Backend } from "@/app/lib/data";
 export default function SizeInputButtonGroup() {
   const { modelManager } = useGenerationManager();
+  const { graphManager } = useGenerationManager();
   const currentBoxSize = modelManager.boundingBoxSize;
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGenerate3DModel = async () => {
     setIsLoading(true);
+    // try {
+    //   await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    //   const modelPath = await generate3DModel(currentBoxSize);
+    //   console.log("3D model generated:", modelPath);
+    //   console.log(
+    //     "Backend Graph Data is",
+    //     graphManager.formalizeGraphIntoNodesAndEdgesForBackend()
+    //   );
+    //   console.log("Backend Model Size is", modelManager.boundingBoxSize);
+    //   modelManager.updateModel(modelPath);
+    // } catch (error) {
+    //   console.error("Failed to generate 3D model:", error);
+    // } finally {
+    //   setIsLoading(false);
+    // }
+    const formalizedGraph =
+      graphManager.formalizeGraphIntoNodesAndEdgesForBackend();
+    const modelSize = modelManager.boundingBoxSize;
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      const modelPath = await generate3DModel(currentBoxSize);
-      console.log("3D model generated:", modelPath);
-
-      modelManager.updateModel(modelPath);
+      const model = await generate3DModel_Backend(formalizedGraph, modelSize);
+      console.log(
+        "Backend Graph Data is",
+        graphManager.formalizeGraphIntoNodesAndEdgesForBackend()
+      );
+      console.log("Backend Model Size is", modelManager.boundingBoxSize);
+      // modelManager.updateModel(model);
     } catch (error) {
       console.error("Failed to generate 3D model:", error);
     } finally {

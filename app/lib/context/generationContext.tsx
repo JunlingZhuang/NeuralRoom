@@ -36,12 +36,7 @@ export const GenerationManagerProvider = ({
     initialBottomCenterPoint
   );
 
-  const initialGraph = {
-    Nodes: [{ id: "node1" }],
-    Edges: [],
-  };
-
-  const graphManager = createGraphManager(initialGraph);
+  const graphManager = createGraphManager();
 
   const generationManager = { modelManager, graphManager };
 

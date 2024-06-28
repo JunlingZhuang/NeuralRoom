@@ -13,6 +13,7 @@ import torch.utils.data
 # Local application-specific imports
 # sys.path.append("../")
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+print("project root is",project_root)
 sys.path.append(project_root)
 from dataset.threedfront_dataset import DatasetSceneGraph
 from helpers.util import (
