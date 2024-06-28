@@ -1,6 +1,6 @@
 {
   "lr": 0.0001,
-  "exp": "test/partitionv2_simedge2_unit1_woCLIP_1500",
+  "exp": "api/test/partitionv2_simedge2_unit1_woCLIP_1500",
   "logf": "logs",
   "outf": "checkpoint",
   "nepoch": 401,
@@ -12,7 +12,7 @@
   "with_CLIP": false,
   "with_feats": false,
   "with_changes": true,
-  "dataset": "test/partitionv2_simedge2_unit1_woCLIP_1500_GT",
+  "dataset": "api/test/partitionv2_simedge2_unit1_woCLIP_1500_GT",
   "residual": true,
   "network_type": "v1_box",
   "manualSeed": 7484,
@@ -20,7 +20,7 @@
   "weight_D_box": 0.1,
   "auxlr": 0.0001,
   "num_box_params": 6,
-  "data_list": "test/partitionv2_simedge2_unit1_woCLIP_1500_GT/1500_combined.txt",
+  "data_list": "api/test/partitionv2_simedge2_unit1_woCLIP_1500_GT/1500_combined.txt",
   "use_unit_box": "preGNN",
   "unit_box_mean": [
     9.803231245551602,
