@@ -46,6 +46,18 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update Auto Scaling Group to Scale Up
+        run: |
+          aws autoscaling update-auto-scaling-group --auto-scaling-group-name awseb-e-2q9yi5rnw3-stack-AWSEBAutoScalingGroup-HXdPIbdbQkpo \
+            --min-size 1 --max-size 1 --desired-capacity 1 --region ${{ secrets.AWS_REGION }}
+
       - name: Generate deployment package
         run: zip -r deploy.zip . -x '*.git*'
 
@@ -60,3 +72,8 @@ jobs:
           existing_bucket_name: elasticbeanstalk-us-east-2-590183697706
           region: ${{ secrets.AWS_REGION }}
           deployment_package: deploy.zip
+
+      - name: Scale Down After Deployment
+        run: |
+          aws autoscaling update-auto-scaling-group --auto-scaling-group-name awseb-e-2q9yi5rnw3-stack-AWSEBAutoScalingGroup-HXdPIbdbQkpo \
+            --min-size 0 --max-size 1 --desired-capacity 0 --region ${{ secrets.AWS_REGION }}
