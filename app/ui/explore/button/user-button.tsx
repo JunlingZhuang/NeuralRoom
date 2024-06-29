@@ -2,7 +2,7 @@
 
 import React from "react";
 import UserIcon from "@/app/ui/icon/user-icon";
-import CustomButton from "@/app/ui/explore/button/active-button";
+import CustomActiveButton from "@/app/ui/explore/button/base-type/active-button";
 
 export default function UserButton({
   isActive,
@@ -14,7 +14,7 @@ export default function UserButton({
   borderWidth: number;
 }) {
   return (
-    <CustomButton
+    <CustomActiveButton
       color="secondary"
       variant="bordered"
       radius="full"
@@ -25,6 +25,6 @@ export default function UserButton({
       borderWidth={borderWidth}
     >
       <UserIcon />
-    </CustomButton>
+    </CustomActiveButton>
   );
 }

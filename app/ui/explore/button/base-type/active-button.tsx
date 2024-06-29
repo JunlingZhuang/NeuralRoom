@@ -20,10 +20,10 @@ interface CustomTabButtonProps {
   onClick: () => void;
   children: React.ReactNode;
   ariaLabel: string;
-  borderWidth?: number; 
+  borderWidth?: number;
 }
 
-export default function CustomButton({
+export default function CustomActiveButton({
   color,
   variant,
   radius,
@@ -39,7 +39,7 @@ export default function CustomButton({
       isIconOnly
       className={classNames(
         isActive ? "bg-main-blue ring-4 ring-main-blue border-black" : "",
-        borderWidth ? `border-${borderWidth}` : "" 
+        borderWidth ? `border-${borderWidth}` : ""
       )}
       color={color}
       variant={variant}
@@ -47,7 +47,7 @@ export default function CustomButton({
       radius={radius}
       size={size}
       onClick={onClick}
-      style={{ borderWidth: borderWidth }} 
+      style={{ borderWidth: borderWidth }}
     >
       {React.cloneElement(children as React.ReactElement, {
         className: classNames(

@@ -19,7 +19,6 @@ export default function InputPanel() {
         return <GraphContentPanel />;
       case "history":
         return <HistoryContentPanel />;
-      // 添加更多case以处理其他图标的内容
       default:
         return null;
     }

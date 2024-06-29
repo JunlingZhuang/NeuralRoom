@@ -1,24 +1,34 @@
 import React, { useState } from "react";
-import SizeSlider from "@/app/ui/explore/button/size-slider";
+import SizeSlider from "@/app/ui/explore/button/base-type/size-slider";
 import { Button } from "@nextui-org/react";
 import Generate3DButton from "@/app/ui/explore/button/generate-3D-button";
 import { useGenerationManager } from "@/app/lib/context/generationContext";
 import { generate3DModel } from "@/app/lib/data";
+import { generate3DModel_Backend } from "@/app/lib/data";
 
 export default function SizeInputButtonGroup() {
   const { modelManager } = useGenerationManager();
+  const { graphManager } = useGenerationManager();
   const currentBoxSize = modelManager.boundingBoxSize;
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGenerate3DModel = async () => {
     setIsLoading(true);
+    const modelSize = modelManager.boundingBoxSize;
+    const formalizedGraph =
+      graphManager.formalizeGraphIntoNodesAndEdgesForBackend(); // 用实际的 formalizedGraph 替换
+
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const modelBlob = await generate3DModel_Backend(
+        formalizedGraph,
+        modelSize
+      );
+      console.log("Backend Graph Data is", formalizedGraph);
+      console.log("Backend Model Size is", modelSize);
 
-      const modelPath = await generate3DModel(currentBoxSize);
-      console.log("3D model generated:", modelPath);
-
-      modelManager.updateModel(modelPath);
+      // 将模型数据转换为 Blob 对象
+      const objBlob = new Blob([modelBlob], { type: "model/obj" });
+      modelManager.updateModel(objBlob);
     } catch (error) {
       console.error("Failed to generate 3D model:", error);
     } finally {

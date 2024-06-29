@@ -9,7 +9,6 @@ export type UserProfile = {
   printProfile: () => void;
 };
 
-// 初始化函数
 export const createUserProfile = (
   userPersona: string,
   bedroomNum: number,
