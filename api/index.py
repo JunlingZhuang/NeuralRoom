@@ -5,8 +5,18 @@ import re
 import json
 from flask_cors import CORS
 from pathlib import Path
+import sys
 
-from scripts.visualize_box_version import (
+
+
+# 获取当前脚本的绝对路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+print("current_dir",current_dir)
+
+sys.path.append(current_dir)
+
+
+from api.scripts.visualize_box_version import (
     prepare_dataset_and_model,
     generate_queried_unit_mesh,
 )
@@ -20,9 +30,7 @@ dataset = None
 model = None
 args = None
 
-# 获取当前脚本的绝对路径
-current_dir = os.path.dirname(os.path.abspath(__file__))
-print("current_dir",current_dir)
+
 # 使用绝对路径加载配置文件
 args_location = os.path.join(current_dir, "test/partitionv2_simedge2_unit1_woCLIP_1500/args.json")
 
