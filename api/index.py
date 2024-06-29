@@ -23,7 +23,6 @@ model = None
 args = None
 
 
-# 使用绝对路径加载配置文件
 args_location = os.path.join(current_dir, "test/partitionv2_simedge2_unit1_woCLIP_1500/args.json")
 
 
