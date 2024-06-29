@@ -1,15 +1,7 @@
 from flask import Flask, request, jsonify
-import subprocess
 import os
-import re
-import json
-from flask_cors import CORS
-from pathlib import Path
 import sys
 
-
-
-# 获取当前脚本的绝对路径
 current_dir = os.path.dirname(os.path.abspath(__file__))
 print("current_dir",current_dir)
 
