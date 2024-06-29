@@ -14,33 +14,21 @@ export default function SizeInputButtonGroup() {
 
   const handleGenerate3DModel = async () => {
     setIsLoading(true);
-    // try {
-    //   await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    //   const modelPath = await generate3DModel(currentBoxSize);
-    //   console.log("3D model generated:", modelPath);
-    //   console.log(
-    //     "Backend Graph Data is",
-    //     graphManager.formalizeGraphIntoNodesAndEdgesForBackend()
-    //   );
-    //   console.log("Backend Model Size is", modelManager.boundingBoxSize);
-    //   modelManager.updateModel(modelPath);
-    // } catch (error) {
-    //   console.error("Failed to generate 3D model:", error);
-    // } finally {
-    //   setIsLoading(false);
-    // }
-    const formalizedGraph =
-      graphManager.formalizeGraphIntoNodesAndEdgesForBackend();
     const modelSize = modelManager.boundingBoxSize;
+    const formalizedGraph =
+      graphManager.formalizeGraphIntoNodesAndEdgesForBackend(); // 用实际的 formalizedGraph 替换
+
     try {
-      const model = await generate3DModel_Backend(formalizedGraph, modelSize);
-      console.log(
-        "Backend Graph Data is",
-        graphManager.formalizeGraphIntoNodesAndEdgesForBackend()
+      const modelBlob = await generate3DModel_Backend(
+        formalizedGraph,
+        modelSize
       );
-      console.log("Backend Model Size is", modelManager.boundingBoxSize);
-      // modelManager.updateModel(model);
+      console.log("Backend Graph Data is", formalizedGraph);
+      console.log("Backend Model Size is", modelSize);
+
+      // 将模型数据转换为 Blob 对象
+      const objBlob = new Blob([modelBlob], { type: "model/obj" });
+      modelManager.updateModel(objBlob);
     } catch (error) {
       console.error("Failed to generate 3D model:", error);
     } finally {

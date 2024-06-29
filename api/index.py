@@ -36,7 +36,7 @@ print("model initialized")
 #     return jsonify({"count": global_count})
 
 
-@app.route("/api/generate_backend", methods=["Get"])
+@app.route("/api/generate_backend", methods=["POST"])
 def generate_model():
     print("generate_model")
     data = request.get_json()

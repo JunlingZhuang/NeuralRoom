@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 
-
 export type BoundingBoxSize = {
   length: number;
   width: number;
@@ -15,35 +14,35 @@ export type BottomCenterPoint = {
 };
 
 export type ModelManager = {
-  model: string | null;
+  model: Blob | null;
   boundingBoxSize: BoundingBoxSize;
   floorNum: number;
   bottomCenterPoint: BottomCenterPoint;
-  updateModel: (model: string | null) => void;  
+  updateModel: (model: Blob | null) => void;
   updateBoundingBoxSize: (boundingBoxSize: BoundingBoxSize) => void;
   updateFloorNum: (floorNum: number) => void;
   updateBottomCenterPoint: (bottomCenterPoint: BottomCenterPoint) => void;
 };
 
 export const createModelManager = (
-  initialModel: string | null,
+  initialModel: Blob | null,
   initialBoundingBoxSize: BoundingBoxSize,
   initialFloorNum: number,
   initialBottomCenterPoint: BottomCenterPoint
 ): ModelManager => {
+  const [model, setModel] = useState<Blob | null>(initialModel);
   const [boundingBoxSize, setBoundingBoxSize] = useState<BoundingBoxSize>(
     initialBoundingBoxSize
   );
-
-  const [model, setModel] = useState<string | null>(initialModel);
   const [floorNum, setFloorNum] = useState<number>(initialFloorNum);
   const [bottomCenterPoint, setBottomCenterPoint] = useState<BottomCenterPoint>(
     initialBottomCenterPoint
   );
 
-  const updateModel = (model: string | null) => {
-    setModel(model);
+  const updateModel = (newModel: Blob | null) => {
+    setModel(newModel);
   };
+
   const updateBoundingBoxSize = (
     partialBoundingBoxSize: Partial<BoundingBoxSize>
   ) => {
@@ -52,6 +51,7 @@ export const createModelManager = (
       ...partialBoundingBoxSize,
     }));
   };
+
   const updateFloorNum = (newFloorNum: number) => {
     setFloorNum(newFloorNum);
   };

@@ -78,6 +78,7 @@ export const generate3DModel_Backend = async (
   try {
     const { nodesData, edgesData } = formalizedGraph;
     // create the request body
+
     const requestBody = {
       nodes: nodesData,
       edges: edgesData,
@@ -99,7 +100,10 @@ export const generate3DModel_Backend = async (
     }
 
     const data = await response.json();
-    console.log("Successfully get model from backend, the model is", data);
+    console.log(
+      "Successfully get model from backend, the model is",
+      data.model_data
+    );
     return data.model_data;
   } catch (error) {
     console.error("Error generating 3D model:", error);

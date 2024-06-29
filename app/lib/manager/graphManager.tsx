@@ -8,7 +8,8 @@ import { fetchSampleEdgeData } from "@/app/lib/data";
 export type Node = {
   initX: number;
   initY: number;
-  programIndex: number;
+  id: number;
+  programTypeIndex: number;
   programName: string;
   color?: string;
 };
@@ -52,20 +53,23 @@ export const createGraphManager = (): GraphManager => {
     const nodesJson = await fetchSampleNodehData();
 
     const nodes = await Promise.all(
-      nodesJson.map(async (node: { index: number; program: string }) => {
-        const programInfo = await searchProgramInfo({ index: node.index });
+      nodesJson.map(async (node: { id: number; programTypeIndex: number }) => {
+        const programInfo = await searchProgramInfo({
+          programTypeIndex: node.programTypeIndex,
+        });
         const programName = programInfo[0]?.programName || "Unknown Program";
         return {
           initX: Math.random() * 100,
           initY: Math.random() * 100,
-          programIndex: node.index,
+          programTypeIndex: node.programTypeIndex,
+          id: node.id,
           programName,
         };
       })
     );
-
+    console.log("initialNode", nodes);
     const nodeMap = new Map<number, Node>();
-    nodes.forEach((node: Node) => nodeMap.set(node.programIndex, node));
+    nodes.forEach((node: Node) => nodeMap.set(node.id, node));
 
     const edgesJson = await fetchSampleEdgeData();
     const edges = edgesJson.map(
@@ -75,8 +79,8 @@ export const createGraphManager = (): GraphManager => {
         target: nodeMap.get(edge.target),
       })
     );
-    console.log("edges are", edges);
-    console.log("nodes are", nodes);
+    // console.log("edges are", edges);
+    // console.log("nodes are", nodes);
     setGraph({ Nodes: nodes, Edges: edges });
   };
 
@@ -86,13 +90,15 @@ export const createGraphManager = (): GraphManager => {
 
   const formalizeGraphIntoNodesAndEdgesForBackend = () => {
     const { Nodes, Edges } = graph;
-    const nodesData = Nodes.map((node) => node.programIndex);
+    console.log("before node formalize", Nodes);
+    const nodesData = Nodes.map((node) => node.programTypeIndex);
     const edgesData = Edges.map((edge) => [
-      edge.source.programIndex,
+      edge.source.id,
       edge.type,
-      edge.target.programIndex,
+      edge.target.id,
     ]);
-
+    console.log("nodesData is", nodesData);
+    console.log("edgesData is", edgesData);
     return { nodesData, edgesData };
   };
 
@@ -101,7 +107,7 @@ export const createGraphManager = (): GraphManager => {
   };
 
   const searchProgramInfo = async (criteria: {
-    index?: number;
+    programTypeIndex?: number;
     name?: string;
     color?: string;
   }): Promise<ProgramInfo[]> => {
@@ -111,7 +117,8 @@ export const createGraphManager = (): GraphManager => {
     for (const key in programColorDict) {
       const program = programColorDict[key];
       if (
-        (criteria.index !== undefined && program.index === criteria.index) ||
+        (criteria.programTypeIndex !== undefined &&
+          program.programTypeIndex === criteria.programTypeIndex) ||
         (criteria.name !== undefined &&
           program.programName === criteria.name) ||
         (criteria.color !== undefined &&
