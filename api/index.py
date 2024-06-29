@@ -24,16 +24,16 @@ args, model, dataset, _, _ = prepare_dataset_and_model(
     ckpt_epoch=400,
 )
 print("model initialized")
-# @app.route("/api/python")
-# def hello_world():
-#     return "<p>Hello, World!</p>"
+@app.route("/api/python")
+def hello_world():
+    return "<p>Hello, World!</p>"
 
 
-# @app.route("/api/test", methods=["GET"])
-# def add_count():
-#     global global_count
-#     global_count += 1
-#     return jsonify({"count": global_count})
+@app.route("/api/test", methods=["GET"])
+def add_count():
+    global global_count
+    global_count += 1
+    return jsonify({"count": global_count})
 
 
 @app.route("/api/generate_backend", methods=["POST"])
