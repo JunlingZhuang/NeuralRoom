@@ -16,7 +16,7 @@ print("current_dir",current_dir)
 sys.path.append(current_dir)
 
 
-from api.scripts.visualize_box_version import (
+from scripts.visualize_box_version import (
     prepare_dataset_and_model,
     generate_queried_unit_mesh,
 )
