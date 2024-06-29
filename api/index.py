@@ -20,7 +20,7 @@ args = None
 
 # model and dataset initialized when webpage mounted
 args, model, dataset, _, _ = prepare_dataset_and_model(
-    args_location="./test/partitionv2_simedge2_unit1_woCLIP_1500/args.json",
+    args_location="api/test/partitionv2_simedge2_unit1_woCLIP_1500/args.json",
     ckpt_epoch=400,
 )
 print("model initialized")
@@ -36,34 +36,32 @@ print("model initialized")
 #     return jsonify({"count": global_count})
 
 
-
-@app.route('/api/generate_backend',methods=['Get'])
+@app.route("/api/generate_backend", methods=["Get"])
 def generate_model():
     print("generate_model")
     data = request.get_json()
-    nodesData = data.get('nodes')
-    edgesData = data.get('edges')
-    length = data.get('length')
-    height = data.get('height')
-    width = data.get('width')
+    nodesData = data.get("nodes")
+    edgesData = data.get("edges")
+    length = data.get("length")
+    height = data.get("height")
+    width = data.get("width")
     # set length, height, width to float if not None
     length = float(length) if length is not None else 0.0
     height = float(height) if height is not None else 0.0
     width = float(width) if width is not None else 0.0
 
     print(length, height, width)
-    print("Nodes Data received",nodesData)
-    print("Edges Data received",edgesData)
+    print("Nodes Data received", nodesData)
+    print("Edges Data received", edgesData)
     model_file_path = generate_queried_unit_mesh(
         input_objs=nodesData,
-        input_triples = edgesData,
-        unit_box = [length,height,width],
+        input_triples=edgesData,
+        unit_box=[length, height, width],
         args=args,
         model=model,
         train_dataset=dataset,
     )
     print(model_file_path)
-
 
     if model_file_path:
         try:
@@ -75,7 +73,6 @@ def generate_model():
             return jsonify({"error": "Model file not found"}), 404
     else:
         return jsonify({"error": "Model file path not found in script output"}), 404
-
 
 
 @app.route("/health", methods=["GET"])
