@@ -10,19 +10,19 @@ interface SwitchTabProps {
   setActivePanel: (panel: string) => void;
 }
 
-export default function SwitchTab({
+export default function SwitchMainTab({
   activePanel,
   setActivePanel,
 }: SwitchTabProps) {
   return (
-    <div className="absolute top-5 w-2/6 left-6 h-16 min-w-96 bg-panel-bg bg-opacity-50 border-panel-border border-1 p-3 rounded-full pointer-events-auto flex items-center justify-between">
-      <div className="shadow-2xl rounded-full backdrop-blur-xl flex items-center">
+    <div className="absolute top-5 w-2/6 left-6 h-16 min-w-96 bg-panel-bg bg-opacity-50 border-panel-border border-1 p-3 rounded-full pointer-events-auto flex items-center justify-end">
+      {/* <div className="shadow-2xl rounded-full backdrop-blur-xl flex items-center">
         <UserButton
           isActive={activePanel === "user"}
           onClick={() => setActivePanel("user")}
           borderWidth={1.5}
         />
-      </div>
+      </div> */}
       <div className="shadow-2xl backdrop-blur-xl flex items-center space-x-3 border-1 border-panel-border rounded-full p-2">
         <HistoryButton
           isActive={activePanel === "history"}
