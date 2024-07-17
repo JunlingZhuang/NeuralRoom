@@ -1,0 +1,36 @@
+{
+  "lr": 0.0001,
+  "exp": "api/test/new_prior_1500",
+  "logf": "logs",
+  "outf": "checkpoint",
+  "nepoch": 401,
+  "device": "cuda",
+  "large": false,
+  "batchSize": 8,
+  "with_SDF": false,
+  "with_CLIP": false,
+  "with_feats": false,
+  "with_changes": false,
+  "dataset": "api/test/new_prior_1500_GT",
+  "residual": true,
+  "network_type": "v5_box",
+  "manualSeed": 7494,
+  "loadmodel": false,
+  "num_box_params": 6,
+  "data_list": "api/test/new_prior_1500_GT/1500_combined.txt",
+  "use_gt_edge_feats": true,
+  "angle_num": 24,
+  "norm_scale": 2,
+  "embed_dim": 256,
+  "categorize_latents": true,
+  "unit_box_mean": [
+    10.250294046775347,
+    3.8060620127569074,
+    9.991708334514504
+  ],
+  "unit_box_std": [
+    3.5655077223519855,
+    1.3336284482475205,
+    3.171610738954131
+  ]
+}
