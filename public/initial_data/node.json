@@ -1,8 +1,14 @@
 [
-  { "id": 0, "programTypeIndex": 2 },
-  { "id": 1, "programTypeIndex": 1 },
-  { "id": 2, "programTypeIndex": 3 },
-  { "id": 3, "programTypeIndex": 4 },
-  { "id": 4, "programTypeIndex": 5 },
-  { "id": 5, "programTypeIndex": 5 }
+  {
+    "id": 0,
+    "programTypeIndex": 3
+  },
+  {
+    "id": 1,
+    "programTypeIndex": 13
+  },
+  {
+    "id": 2,
+    "programTypeIndex": 11
+  }
 ]

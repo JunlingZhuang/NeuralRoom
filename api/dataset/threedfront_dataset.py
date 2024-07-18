@@ -15,7 +15,6 @@ from helpers.util import normalize_box_params
 import random
 import pickle
 import trimesh
-
 changed_relationships_dict = {
     "left": "right",
     "right": "left",
@@ -43,7 +42,6 @@ def load_ckpt(ckpt):
     return state_dict
 
 
-# TODO: simplify the categories
 # TODO: check if need to change with_feats into with_SDF_feats
 
 
@@ -72,6 +70,9 @@ class DatasetSceneGraph(data.Dataset):
         class_choice=None,
         data_list=None,
         device="cuda",
+        use_gt_edge_feats=False,
+        angle_num=24,
+        norm_scale=3,
     ):
         # Basic setting
         self.seed = seed
@@ -102,6 +103,12 @@ class DatasetSceneGraph(data.Dataset):
         self.unit_box = {}  # a dictionary maps absolute x y z size param
         self.unit_box_mean = None
         self.unit_box_std = None
+        self.use_gt_edge_feats = use_gt_edge_feats
+        self.angle_num = angle_num
+        self.norm_scale = norm_scale
+        self.edge_feats = []
+        self.edge_feats_mean = None
+        self.edge_feats_std = None
 
         if self.root_3dfront == "":
             self.root_3dfront = os.path.join(self.root, "visualization")
@@ -142,6 +149,10 @@ class DatasetSceneGraph(data.Dataset):
 
         # normalize unit_box
         self.normalize_unit_boxes()
+
+        # normalize edge feats
+        if self.use_gt_edge_feats:
+            self.get_edgefeats_mean_and_std()
 
         # Feature Check (if needed)
         self._check_for_missing_features()
@@ -273,10 +284,8 @@ class DatasetSceneGraph(data.Dataset):
                 if scan_id in scan_list:
                     relationships = []
                     for relationship in scan["relationships"]:
-                        relationship[2]
-                        relationships.append(
-                            relationship
-                        )  # TODO: here minus one and in getitem +1, seems redundant
+                        relationships.append(relationship)
+                        self.edge_feats.append(relationship[-1])
 
                     # for every scan in rel json, we append the scan id
                     rel[scan_id] = (
@@ -405,6 +414,12 @@ class DatasetSceneGraph(data.Dataset):
         self.unit_box_mean = np.mean(all_dims, axis=0)
         self.unit_box_std = np.std(all_dims, axis=0)
 
+    def get_edgefeats_mean_and_std(self):
+        all_dims = np.array(self.edge_feats)
+        # Calculate mean and standard deviation along the appropriate axis
+        self.edge_feats_mean = np.mean(all_dims, axis=0)
+        self.edge_feats_std = np.std(all_dims, axis=0)
+
     def normalize_unit_boxes(self):
         # Ensure mean and std are calculated
         if self.unit_box_mean is None or self.unit_box_std is None:
@@ -412,7 +427,7 @@ class DatasetSceneGraph(data.Dataset):
 
         # Normalize each unit box using the calculated mean and standard deviation
         normalized_unit_boxes = {
-            scan_id: (dims - self.unit_box_mean) / self.unit_box_std
+            scan_id: self.norm_scale * ((dims - self.unit_box_mean) / self.unit_box_std)
             for scan_id, dims in self.unit_box.items()
         }
 
@@ -558,14 +573,15 @@ class DatasetSceneGraph(data.Dataset):
                 else:
                     cat_ids_grained.append(scene_class_id)
                 bbox = np.array(self.tight_boxes_json[scan_id][key]["param7"].copy())
-                # bbox[3:6] -= np.array(self.tight_boxes_json[scan_id]["scene_center"]) #TODO: already normalized, no need to substract
 
                 instances_order.append(key)
-                bins = np.linspace(np.deg2rad(-180), np.deg2rad(180), 24)
+                # Discretized into specified number of  angles
+                bins = np.linspace(np.deg2rad(-180), np.deg2rad(180), self.angle_num)
                 angle = np.digitize(bbox[6], bins)
-                bbox = normalize_box_params(bbox, file=self.box_normalized_stats)
+                bbox = normalize_box_params(
+                    bbox, file=self.box_normalized_stats, scale=self.norm_scale
+                )
                 bbox[6] = angle
-
                 tight_boxes.append(bbox)
 
             if self.use_SDF:
@@ -665,16 +681,26 @@ class DatasetSceneGraph(data.Dataset):
         triples = []
         words = []
         rel_json = self.relationship_json[scan_id]
+        edge_feats = []
+        room_unit_edge_feats = {}
         for r in rel_json:  # create relationship triplets from data
-            r[0] = int(r[0])
+            r[0] = int(r[0])  # TODO: deal with unit node '0'
             r[1] = int(r[1])
             r[2] = int(r[2])
             if r[0] in instance2mask.keys() and r[1] in instance2mask.keys():
                 subject = instance2mask[r[0]] - 1
                 object = instance2mask[r[1]] - 1
                 predicate = r[2]
+                if self.use_gt_edge_feats:
+                    edge_feat = (
+                        self.norm_scale
+                        * (r[4] - self.edge_feats_mean)
+                        / self.edge_feats_std
+                    )
                 if subject >= 0 and object >= 0:
                     triples.append([subject, predicate, object])
+                    if self.use_gt_edge_feats:
+                        edge_feats.append(edge_feat)
                     if not self.large:
                         words.append(
                             self.mapping_full2simple[instance2label[r[0]]]
@@ -691,10 +717,12 @@ class DatasetSceneGraph(data.Dataset):
                             + " "
                             + instance2label[r[1]]
                         )  # TODO: check
+                elif object == -1 and self.use_gt_edge_feats:  # unit node
+                    room_unit_edge_feats[subject] = edge_feat
             else:
                 continue
 
-        return triples, words
+        return triples, words, edge_feats, room_unit_edge_feats
 
     def add_scene_root_node(
         self,
@@ -706,16 +734,21 @@ class DatasetSceneGraph(data.Dataset):
         obj_sdf_list,
         mask_to_parent,
         scan_id,
+        edge_feats,
+        room_unit_edge_feats,
     ):
         scene_idx = len(cat_ids)
         for i, ob in enumerate(cat_ids):
             # check if this obj is a room node
             if mask_to_parent[i] == i:
                 triples.append([i, 0, scene_idx])
+
                 words.append(
                     self.get_key(self.classes, ob) + " " + "belong to" + " " + "unit"
                 )
-        cat_ids.append(0)  # TODO:check
+                if self.use_gt_edge_feats:
+                    edge_feats.append(room_unit_edge_feats[i])
+        cat_ids.append(0)
         cat_ids_grained.append(0)
         mask_to_parent.append(scene_idx)
 
@@ -735,6 +768,7 @@ class DatasetSceneGraph(data.Dataset):
             tight_boxes,
             obj_sdf_list,
             mask_to_parent,
+            edge_feats,
         )
 
     def compute_clip_feats(self, cat_ids, instances_order, words):
@@ -866,7 +900,9 @@ class DatasetSceneGraph(data.Dataset):
 
         # compute triples and CLIP words
         # triple use idx of obj list to refer to obj
-        triples, words = self.compute_triples(scan_id, instance2mask, instance2label)
+        triples, words, edge_feats, room_unit_edge_feats = self.compute_triples(
+            scan_id, instance2mask, instance2label
+        )
 
         if self.use_scene_rels:
             # add _scene_ object and _in_scene_ connections
@@ -878,6 +914,7 @@ class DatasetSceneGraph(data.Dataset):
                 tight_boxes,
                 obj_sdf_list,
                 mask_to_parent,
+                edge_feats,
             ) = self.add_scene_root_node(
                 triples,
                 words,
@@ -887,6 +924,8 @@ class DatasetSceneGraph(data.Dataset):
                 obj_sdf_list,
                 mask_to_parent,
                 scan_id,
+                edge_feats,
+                room_unit_edge_feats,
             )
         # if features are requested but the files don't exist, we run all loaded pointclouds through clip
         # to compute them and then save them for future usage
@@ -944,6 +983,11 @@ class DatasetSceneGraph(data.Dataset):
         if self.with_feats:
             output["encoder"]["feats"] = torch.from_numpy(
                 np.array(feats_in).astype(np.float32)
+            )
+
+        if self.use_gt_edge_feats:
+            output["encoder"]["gt_edge_feats"] = torch.from_numpy(
+                np.array(edge_feats).astype(np.float32)
             )
 
         output["decoder"] = copy.deepcopy(output["encoder"])
@@ -1008,6 +1052,8 @@ class DatasetSceneGraph(data.Dataset):
             graph["words"].pop(i)
 
         graph["triples"] = graph["triples"][mask_rel]
+        if self.use_gt_edge_feats:
+            graph["gt_edge_feats"] = graph["gt_edge_feats"][mask_rel]
         if self.with_CLIP:
             graph["rel_feats"] = graph["rel_feats"][mask_rel]
 
@@ -1174,6 +1220,7 @@ class DatasetSceneGraph(data.Dataset):
             all_rel_feats = []
             all_obj_to_pidx = []
             all_unit_box = []
+            all_gt_edge_feats = []
 
             obj_offset = 0
 
@@ -1195,6 +1242,8 @@ class DatasetSceneGraph(data.Dataset):
                     all_sdfs.append(batch[i][key]["sdfs"])
                 if "feats" in batch[i][key]:
                     all_feats.append(batch[i][key]["feats"])
+                if "gt_edge_feats" in batch[i][key]:
+                    all_gt_edge_feats.append(batch[i][key]["gt_edge_feats"])
                 if "text_feats" in batch[i][key]:
                     all_text_feats.append(batch[i][key]["text_feats"])
                 if "rel_feats" in batch[i][key]:
@@ -1220,6 +1269,7 @@ class DatasetSceneGraph(data.Dataset):
                 all_objs.append(batch[i][key]["objs"])
                 all_objs_grained.append(batch[i][key]["objs_grained"])
                 all_boxes.append(boxes)
+                obj_to_pidx += obj_offset
                 all_obj_to_pidx.append(obj_to_pidx)
                 all_unit_box.append(unit_box)
 
@@ -1275,6 +1325,9 @@ class DatasetSceneGraph(data.Dataset):
             if len(all_rel_feats) > 0:
                 all_rel_feats = torch.cat(all_rel_feats)
                 outputs["rel_feats"] = all_rel_feats
+            if len(all_gt_edge_feats) > 0:
+                all_gt_edge_feats = torch.cat(all_gt_edge_feats)
+                outputs["gt_edge_feats"] = all_gt_edge_feats
             out[key] = outputs
 
         return out
@@ -1282,43 +1335,3 @@ class DatasetSceneGraph(data.Dataset):
     def collate_fn_vaegan_points(self, batch):
         """Wrapper of the function collate_fn_vaegan to make it also return points"""
         return self.collate_fn_vaegan(batch, use_points=True)
-
-
-if __name__ == "__main__":
-    dataset = DatasetSceneGraph(
-        root="/media/ymxlzgy/Data/Dataset/3D-FRONT",
-        split="val_scans",
-        shuffle_objs=True,
-        use_SDF=False,
-        use_scene_rels=True,
-        with_changes=True,
-        with_feats=False,
-        with_CLIP=True,
-        large=False,
-        seed=False,
-        recompute_clip=False,
-    )
-    a = dataset[0]
-
-    for x in ["encoder", "decoder"]:
-        en_obj = a[x]["objs"].cpu().numpy().astype(np.int32)
-        en_triples = a[x]["triples"].cpu().numpy().astype(np.int32)
-        # instance
-        sub = en_triples[:, 0]
-        obj = en_triples[:, 2]
-        # cat
-        instance_ids = np.array(sorted(list(set(sub.tolist() + obj.tolist()))))  # 0-n
-        cat_ids = en_obj[instance_ids]
-        texts = [dataset.classes_r[cat_id] for cat_id in cat_ids]
-        objs = dict(zip(instance_ids.tolist(), texts))
-        objs = {str(key): value for key, value in objs.items()}
-        for rel in en_triples[:, 1]:
-            if rel == 0:
-                txt = "in"
-                txt_list.append(txt)
-                continue
-            txt = dataset.relationships_dict_r[rel]
-            txt_list.append(txt)
-        txt_list = np.array(txt_list)
-        rel_list = np.vstack((sub, obj, en_triples[:, 1], txt_list)).transpose()
-        print(a["scan_id"])
