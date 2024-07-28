@@ -3,7 +3,7 @@ import os
 import sys
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-print("current_dir",current_dir)
+print("current_dir", current_dir)
 
 sys.path.append(current_dir)
 
@@ -23,15 +23,19 @@ model = None
 args = None
 
 
-args_location = os.path.join(current_dir, "test/partitionv2_simedge2_unit1_woCLIP_1500/args.json")
+args_location = os.path.join(current_dir, "test/new_prior_1500/args.json")
+ckpt_link = (
+    "https://drive.google.com/file/d/1-YjqqoAnv9_FD288mRYIGoNW75CcJaUR/view?usp=sharing"
+)
 
 
 # model and dataset initialized when webpage mounted
 args, model, dataset, _, _ = prepare_dataset_and_model(
-    args_location=args_location,
-    ckpt_epoch=400,
+    args_location=args_location, ckpt_epoch=400, ckpt_link=ckpt_link
 )
 print("model initialized")
+
+
 @app.route("/api/python")
 def hello_world():
     return "<p>Hello, World!</p>"

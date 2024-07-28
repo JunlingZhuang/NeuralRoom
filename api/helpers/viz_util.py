@@ -3,6 +3,7 @@ import yaml
 import trimesh
 import os
 import random
+
 # import open3d as o3d
 import numpy as np
 from helpers.util import (
@@ -11,9 +12,11 @@ from helpers.util import (
 )
 from shapely.geometry import Polygon, MultiPolygon
 from shapely.ops import unary_union
+
 # import json
 import torch
 import plotly.graph_objects as go
+
 # import plotly.express as px
 # import pyrender
 # import imageio
@@ -21,18 +24,167 @@ from PIL import Image
 
 # courtyard>service>storage>bathroom>bedroom>library>kitchen>diningroom>balcony>circulation>livingroom
 ROOM_HIER_MAP = {
-    "bathroom": 3,
-    "bedroom": 4,
-    "diningroom": 7,
-    "kitchen": 6,
-    "library": 5,
+    "bathroom": 4,
+    "bedroom": 5,
+    "diningroom": 8,
+    "kitchen": 7,
+    "library": 6,
     "livingroom": 10,
-    "circulation": 9,
+    "circulation": 3,
     "courtyard": 0,
     "storage": 2,
     "service": 1,
-    "balcony": 8,
+    "balcony": 9,
 }
+
+
+# function to separate room graph from main graph
+def extract_room_graph(data):
+    """
+    input
+    - data: dict, format of data from dataset
+
+    output
+    - room_idxs: room idxs in original obj tensor
+    - room_objs: a tensor of (T,), the room object ids
+    - room_triples: a tensor of (T_r,3), the T_r room-involved edge tuples of (from_idx,edge type, to_idx)
+
+    """
+    objs = data["decoder"]["objs"]
+    triples = data["decoder"]["triples"]
+    obj_to_pidx = data["decoder"]["obj_to_pidx"]
+    room_idxs = torch.where(
+        (obj_to_pidx == torch.arange(objs.shape[0]).to(obj_to_pidx.device))
+        & (objs != 0)
+    )[
+        0
+    ]  # filter out furniture and units
+    room_triples_mask = torch.isin(triples[:, 0], room_idxs) & torch.isin(
+        triples[:, 2], room_idxs
+    )
+    room_triples = triples[room_triples_mask]
+    room_objs = objs[room_idxs]
+
+    return room_idxs, room_objs, room_triples
+
+
+def get_bedroom_count(room_objs, obj_idx2name):
+    """
+    input
+    - room_objs: a tensor of (N_r,), room node category id
+    - obj_idx2name: a dictionary, map category id to its label
+
+    output
+    - bedroom_count: an int showing the number of bedroom count
+    """
+    bedroom_num = 0
+    for room_obj in room_objs:
+        if "bedroom" == obj_idx2name[int(room_obj)]:
+            bedroom_num += 1
+
+    return bedroom_num
+
+
+# get all zs for the whole graph
+# use room_idxs to retrieve room nodes
+# sum them to get the new latent vector for the whole room graph
+def get_graph_latent_features(
+    data,
+    random_seed=852,
+    model=None,
+    args=None,
+    point_classes_idx=None,
+):
+    device = args["device"]
+    dec_objs = data["decoder"]["objs"]
+    dec_triples = data["decoder"]["triples"]
+    dec_text_feat = None
+    dec_rel_feat = None
+    if args["with_CLIP"]:
+        dec_rel_feat = data["decoder"]["rel_feats"]
+        dec_text_feat = data["decoder"]["text_feats"]
+        dec_rel_feat = dec_rel_feat.to(device)
+        dec_text_feat = dec_text_feat.to(device)
+    dec_unit_box = data["decoder"]["unit_box"]
+
+    with torch.no_grad():
+        np.random.seed(random_seed)
+
+    dec_objs = dec_objs.to(device)
+    dec_triples = dec_triples.to(device)
+    dec_unit_box = dec_unit_box.to(device)
+
+    sample_with_categories = args.get("categorize_latents", False)
+    with torch.no_grad():
+        s, p, o = dec_triples.chunk(3, dim=1)  # All have shape (T, 1)
+        s, p, o = [x.squeeze(1) for x in [s, p, o]]  # Now have shape (T,)
+        edges = torch.stack([s, o], dim=1)  # Shape is (T, 2)
+
+        obj_vecs = model.vae_box.obj_embeddings_dc(dec_objs)
+        s_embeddings = obj_vecs[s, :]
+        o_embeddings = obj_vecs[o, :]
+        pred_vecs = torch.cat(
+            (s_embeddings, o_embeddings), dim=1
+        )  # use concatenation of node feats as edge feats initialization
+        pred_vecs = model.vae_box.pred_embeddings_dc(pred_vecs, p)
+        unit_box_vecs = model.vae_box.unit_box_embeddings(dec_unit_box)
+        obj_vecs_ = torch.cat([obj_vecs, unit_box_vecs], dim=1)
+        if sample_with_categories:
+            assert point_classes_idx is not None
+            z = []
+            for idxz in dec_objs:
+                idxz = int(idxz.cpu())
+                if idxz in point_classes_idx:
+                    z.append(
+                        torch.from_numpy(
+                            np.random.multivariate_normal(
+                                model.mean_est_box[idxz], model.cov_est_box[idxz], 1
+                            )
+                        )
+                        .float()
+                        .to(device)
+                    )
+                else:
+                    z.append(
+                        torch.from_numpy(
+                            np.random.multivariate_normal(
+                                model.mean_est_box[-1], model.cov_est_box[-1], 1
+                            )
+                        )
+                        .float()
+                        .to(device)
+                    )
+            z = torch.cat(z, 0)
+        else:
+            z = (
+                torch.from_numpy(
+                    np.random.multivariate_normal(
+                        model.mean_est_box, model.cov_est_box, dec_objs.size(0)
+                    )
+                )
+                .float()
+                .to(device)
+            )
+        obj_vecs_ = torch.cat([obj_vecs_, z], dim=1)
+        obj_vecs_, pred_vecs = model.vae_box.gconv_net_dc(obj_vecs_, pred_vecs, edges)
+
+    return obj_vecs_
+
+
+def pool_latent_features(
+    room_idxs,
+    obj_vecs_,
+    graph_type="room",
+):
+    assert graph_type in ["full", "room", "root"]
+    if graph_type == "full":
+        pooled_feat = torch.sum(obj_vecs_[:-1], dim=0)
+    elif graph_type == "room":
+        room_vecs = obj_vecs_[room_idxs]
+        pooled_feat = torch.sum(room_vecs, dim=0)
+    elif graph_type == "root":
+        pooled_feat = obj_vecs_[-1]
+    return pooled_feat
 
 
 def load_semantic_scene_graphs_custom(
@@ -227,8 +379,31 @@ def force_room_pair_attach(room1_idx, room2_idx, boxes, obj_to_pidx):
     return all_boxes
 
 
+def modularize_room(denormalized_boxes, obj_to_pidx, module_dim=0.5):
+    """
+    denormalized_boxes: a list of box parameter tensors [dx,dy,dz,cenx,ceny,cenz]
+    obj_to_pidx: a list maps child to their parent index
+    module_dim: the module dimension used to standarize the room boxes
+    """
+    num_objs = denormalized_boxes.size(0)
+    fur_idxs = [i for i in range(num_objs - 1) if i != obj_to_pidx[i]]
+    room_idxs = [i for i in range(num_objs - 1) if i not in fur_idxs]
+    for i in room_idxs:
+        room_box = denormalized_boxes[i]
+        room_size = room_box[:3]
+        room_cen = room_box[3:]
+        room_origin = room_cen - room_size / 2
+        mod_size = torch.abs(torch.round(room_size / module_dim) * module_dim)
+        mod_origin = torch.round(room_origin / module_dim) * module_dim
+        mod_cen = mod_origin + mod_size / 2
+        denormalized_boxes[i][:3] = mod_size
+        denormalized_boxes[i][3:] = mod_cen
+
+    return denormalized_boxes
+
+
 def force_room_adjacency(
-    adjacency_list, boxes, obj_to_pidx, max_iter=100, vertical_threshold=1.5
+    adjacency_list, boxes, obj_to_pidx, max_iter=100, vertical_threshold=2.0
 ):
     """
     Check and adjust positions of all adjacent room pairs iteratively until no more adjustments are needed
@@ -339,15 +514,25 @@ def rationalize_list(numbers, threshold=0.2):
 
 
 def rel_to_abs_box_params(
-    boxes, obj_to_pidx, unit_box_size, unit_mean, unit_std, angles_pred=None
+    boxes,
+    obj_to_pidx,
+    unit_box_size,
+    unit_mean,
+    unit_std,
+    angles_pred=None,
+    norm_scale=1,
+    module_dim=None,
 ):
     """Convert the relative params (dx,dy,dz,origin_x,origin_y,origin_z), which all
     normalized within their parent bbox, into abs params  (dx,dy,dz,cen_x,cen_y,cen_z)
     """
     # Denormalize unit_box to abs size
-    unit_box_size = unit_box_size * unit_std + unit_mean
+    unit_box_size = (unit_box_size * unit_std) / norm_scale + unit_mean
     # Calculate unit box's origin based on its center being at (0,0,0)
     unit_origin = torch.tensor([0.0, 0.0, 0.0], device=unit_box_size.device) - (
+        unit_box_size / 2
+    )
+    unit_max = torch.tensor([0.0, 0.0, 0.0], device=unit_box_size.device) + (
         unit_box_size / 2
     )
     # Initialize tensor for unnormalized boxes
@@ -356,11 +541,10 @@ def rel_to_abs_box_params(
 
     fur_idxs = [i for i in range(num_objs - 1) if i != obj_to_pidx[i]]
     room_idxs = [i for i in range(num_objs - 1) if i not in fur_idxs]
-
     # iterate the origin_y s, rationalize them with threshold 0.2
     room_ori_y = [boxes[i, 4] for i in room_idxs]
     rationalized_ori_y = rationalize_list(room_ori_y)
-
+    threshold = 0.8
     # Unnormalize room boxes using unit box size
     for idx, i in enumerate(room_idxs):  # Exclude the unit itself
         norm_box = boxes[i]
@@ -370,7 +554,15 @@ def rel_to_abs_box_params(
         for j in range(3):
             max_val = 1.0 - norm_box[j]
             norm_box[j + 3] = torch.clamp(norm_box[j + 3], min=0.0, max=max_val)
+
         origin = norm_box[3:] * unit_box_size + unit_origin
+        if module_dim is not None:
+            size = torch.abs(torch.round(size / module_dim) * module_dim)
+            origin = torch.round(origin / module_dim) * module_dim
+        # push to the boundary
+        max_pt = origin + size
+        origin = torch.where((origin - unit_origin) < threshold, unit_origin, origin)
+        origin = torch.where((unit_max - max_pt) < threshold, unit_max - size, origin)
         cen = origin + (size / 2)
         unnormalized_boxes[i, :3] = size
         unnormalized_boxes[i, 3:] = cen
@@ -593,12 +785,74 @@ def create_scene_meshes(
     sdf_dir,
     retrieve_sdf=True,
     ceiling_and_floor=False,
+    substract_room=False,
 ):
     # draw from furniture id
     num_obj = dec_objs_grained.size(0)
-    shapes_pred = [0.0] * num_obj
-    fur_idxs = [i for i in range(num_obj - 1) if i != obj_to_pidx[i]]
-    room_idxs = [i for i in range(num_obj) if i not in fur_idxs]
+
+    fur_idxs = [i for i in range(num_obj) if i != obj_to_pidx[i]]
+    room_idxs = [
+        i
+        for i in range(num_obj)
+        if i not in fur_idxs
+        and detailed_obj_class[int(dec_objs_grained[i])] != "_unit_"
+    ]
+
+    unit_id = -1
+    shapes_pred = [None] * num_obj
+
+    extrusion_intervals = {}
+    for room_id in room_idxs:
+        mesh = create_floor(denormalized_boxes[room_id], angles_pred[room_id])
+        shapes_pred[room_id] = mesh
+        extrusion_intervals[room_id] = denormalized_boxes[room_id][1]  # y size
+
+    room_hier_dic = {}
+    for room_id in room_idxs:  # ROOM_HIER_MAP
+        room_class = detailed_obj_class[int(dec_objs_grained[int(room_id)])]
+        hier_id = ROOM_HIER_MAP[room_class]
+        room_hier_dic[room_id] = hier_id
+
+    # group rooms by their y level and perform boolean separately
+    room_y_mins = [np.min(shapes_pred[id].vertices[:, 1]) for id in room_idxs]
+    anchors = find_anchors(room_y_mins, threshold=1.5, zero_min=False)
+    room_to_anchor = {}
+    room_y_mins_assigned = []
+
+    for idx, y_min in zip(room_idxs, room_y_mins):
+        nearest_anchor = min(anchors, key=lambda anchor: abs(anchor - y_min))
+        room_y_mins_assigned.append(nearest_anchor)
+        if nearest_anchor in room_to_anchor:
+            room_to_anchor[nearest_anchor].append(idx)
+        else:
+            room_to_anchor[nearest_anchor] = [idx]
+
+    ceilings = []
+    floors = []
+    for anchor, room_idxs_subset in room_to_anchor.items():
+        # Perform boolean operations on each sublist of room indices
+        if not ceiling_and_floor:
+            shapes_pred = perform_boolean_operations(
+                shapes_pred,
+                room_idxs_subset,
+                room_hier_dic,
+                extrusion_intervals,
+                ceiling_and_floor,
+                substract_room=substract_room,
+            )
+        else:
+            shapes_pred, floor, ceiling = perform_boolean_operations(
+                shapes_pred,
+                room_idxs_subset,
+                room_hier_dic,
+                extrusion_intervals,
+                ceiling_and_floor,
+                substract_room=substract_room,
+            )
+            floor.metadata["name"] = "floor"
+            ceiling.metadata["name"] = "ceiling"
+            ceilings.append(ceiling)
+            floors.append(floor)
 
     for fur_id in fur_idxs:
         if retrieve_sdf:
@@ -620,76 +874,29 @@ def create_scene_meshes(
             box_points = params_to_8points_3dfront(box_and_angle, degrees=True)
             min_y = np.min(box_points[:, 1])
             p_id = int(obj_to_pidx[fur_id])
-            parent_y = denormalized_boxes[p_id].float()[4] - (
-                denormalized_boxes[p_id].float()[1] / 2
-            )  # denormalized_boxes (dx, dy, dz, cen_x, cen_y, cen_z)
+
+            parent_y = room_y_mins_assigned[room_idxs.index(p_id)]
             # move min_y to parent's min_y
             offset = min_y - parent_y
-            box_points[:, 1] -= offset.numpy()
+            box_points[:, 1] -= offset
             vertices, faces = box_vertices_faces(box_points)
             mesh = trimesh.Trimesh(vertices=vertices, faces=faces)
             mesh.visual.face_colors = [[240, 125, 125, 255]] * len(mesh.faces)
             shapes_pred[fur_id] = mesh
 
-    extrusion_intervals = {}
-    for room_id in room_idxs:
-        mesh = create_floor(denormalized_boxes[room_id], angles_pred[room_id])
-        shapes_pred[room_id] = mesh
-        extrusion_intervals[room_id] = denormalized_boxes[room_id][1]  # y size
-
-    unit_id = None
-    room_hier_dic = {}
-    for room_id in room_idxs:  # ROOM_HIER_MAP
-        room_class = detailed_obj_class[int(dec_objs_grained[int(room_id)])]
-        if room_class == "_unit_":
-            unit_id = room_id
-        else:
-            hier_id = ROOM_HIER_MAP[room_class]
-            room_hier_dic[room_id] = hier_id
-    room_idxs.remove(unit_id)
-    print("start boolean difference..")
-
-    # group rooms by their y level and perform boolean separately
-    room_y_mins = [np.min(shapes_pred[id].vertices[:, 1]) for id in room_idxs]
-    anchors = find_anchors(room_y_mins, threshold=1.5, zero_min=False)
-    room_to_anchor = {}
-    for idx, y_min in zip(room_idxs, room_y_mins):
-        nearest_anchor = min(anchors, key=lambda anchor: abs(anchor - y_min))
-        if nearest_anchor in room_to_anchor:
-            room_to_anchor[nearest_anchor].append(idx)
-        else:
-            room_to_anchor[nearest_anchor] = [idx]
-
-    ceilings = []
-    floors = []
-    for anchor, room_idxs_subset in room_to_anchor.items():
-        # Perform boolean operations on each sublist of room indices
-        if not ceiling_and_floor:
-            shapes_pred = perform_boolean_operations(
-                shapes_pred,
-                room_idxs_subset,
-                room_hier_dic,
-                extrusion_intervals,
-                ceiling_and_floor,
-            )
-        else:
-            shapes_pred, floor, ceiling = perform_boolean_operations(
-                shapes_pred,
-                room_idxs_subset,
-                room_hier_dic,
-                extrusion_intervals,
-                ceiling_and_floor,
-            )
-            floor.metadata["name"] = "floor"
-            ceiling.metadata["name"] = "ceiling"
-            ceilings.append(ceiling)
-            floors.append(floor)
-
+    meshes = []
     for i, mesh in enumerate(shapes_pred):
         class_name = detailed_obj_class[int(dec_objs_grained[i])]
-        mesh.metadata["name"] = class_name
+        if mesh is not None:
+            mesh.metadata["name"] = class_name
+            meshes.append(mesh)
 
-    return shapes_pred, floors, ceilings
+    # add base
+    base = create_floor(denormalized_boxes[unit_id], angles_pred[unit_id])
+    base.metadata["name"] = "base"
+    meshes.append(base)
+
+    return meshes, floors, ceilings
 
 
 def shapely_to_trimesh_path(shapely_polygon):
@@ -764,6 +971,7 @@ def perform_boolean_operations(
     extrusion_intervals,
     floor_and_ceiling=False,
     apply_material=False,
+    substract_room=False,
 ):
     """
     params:
@@ -772,6 +980,8 @@ def perform_boolean_operations(
     - room_hier : the dictionary that maps room id to its hierarchy id ( the smaller the topper)
     - extrusion_intervals : a dictionary, maps room id to the extrusion height
     - floors_and_ceiling : a bool, set to True will return additional floor and ceiling meshes
+    - apply_material: a bool, set to True if want the generated mesh to include material difference for each class
+    - substract_room: a bool, set to True if want the rooms to substract each other following the room hierachy order
     the function will perform boolean difference operation between rooms, substracting bottom room with top room, and return the new shapes_pred
     """
     # Sort room_idxs based on their hierarchy id from room_hier
@@ -792,21 +1002,21 @@ def perform_boolean_operations(
         current_hierarchy = room_hier[room_idx]
 
         difference_polygon = current_polygon
+        if substract_room:
+            # Subtract each other_polygon one by one
+            for other_idx in sorted_rooms[i + 1 :]:
+                if room_hier[other_idx] <= current_hierarchy:
+                    other_mesh = shapes_pred[other_idx]
+                    other_polygon = mesh_to_shapely_polygon(other_mesh)
 
-        # Subtract each other_polygon one by one
-        for other_idx in sorted_rooms[i + 1 :]:
-            if room_hier[other_idx] <= current_hierarchy:
-                other_mesh = shapes_pred[other_idx]
-                other_polygon = mesh_to_shapely_polygon(other_mesh)
-
-                # Perform the boolean difference operation one by one
-                difference_polygon = difference_polygon.difference(other_polygon)
-                # Check after each subtraction if the polygon is empty
-                if difference_polygon.is_empty:
-                    print(
-                        f"Subtraction resulted in an empty polygon at {other_idx}, stopping further subtractions."
-                    )
-                    break
+                    # Perform the boolean difference operation one by one
+                    difference_polygon = difference_polygon.difference(other_polygon)
+                    # Check after each subtraction if the polygon is empty
+                    if difference_polygon.is_empty:
+                        print(
+                            f"Subtraction resulted in an empty polygon at {other_idx}, stopping further subtractions."
+                        )
+                        break
 
         # Convert the difference polygon back to a trimesh object
         if not difference_polygon.is_empty:
@@ -814,22 +1024,27 @@ def perform_boolean_operations(
             shrinked_poly = difference_polygon.buffer(-0.1)  # wall thickness
             new_poly_with_hole = difference_polygon.difference(shrinked_poly)
             translation_vec = [0, y_min, 0]
-            mutable_mesh = extrude_polygons(
-                new_poly_with_hole, y_interval, translation_vec
-            )
-            # apply material
-            if apply_material:
-                uv = np.random.rand(mutable_mesh.vertices.shape[0], 2)
-                texture_image = Image.open("config/material/wall.png")
-                material = trimesh.visual.texture.SimpleMaterial(image=texture_image)
-                color_visuals = trimesh.visual.TextureVisuals(
-                    uv=uv, image=texture_image, material=material
+            try:
+                mutable_mesh = extrude_polygons(
+                    new_poly_with_hole, y_interval, translation_vec
                 )
-                mutable_mesh.visual = color_visuals
 
-            # add to original list
-            shapes_pred[room_idx] = mutable_mesh
+                # apply material
+                if apply_material:
+                    uv = np.random.rand(mutable_mesh.vertices.shape[0], 2)
+                    texture_image = Image.open("config/material/wall.png")
+                    material = trimesh.visual.texture.SimpleMaterial(
+                        image=texture_image
+                    )
+                    color_visuals = trimesh.visual.TextureVisuals(
+                        uv=uv, image=texture_image, material=material
+                    )
+                    mutable_mesh.visual = color_visuals
 
+                # add to original list
+                shapes_pred[room_idx] = mutable_mesh
+            except:
+                print("error in extrude polygons")
         else:
             print(f"No difference mesh generated between room {room_idx}")
 
@@ -914,274 +1129,3 @@ def export_scene_meshes(shapes_pred, dec_objs, obj_idx2name, exp_path):
 
     # Export the scene to an OBJ file
     scene.export(file_obj=exp_path, file_type="obj")
-
-
-def render_plotly_sdf(
-    box_points,
-    box_and_angle=None,
-    obj_idx2name=None,
-    objs=None,
-    shapes_pred=None,
-    render_shapes=True,
-    render_boxes=True,
-    colors=None,
-    save_as_image=True,
-    filename="render",
-    obj_to_pidx=None,
-):
-    fig = go.Figure()
-
-    objs_id = objs.cpu().detach().numpy()
-    unique_values = list(set(objs_id))
-    edges = [
-        (0, 1),
-        (0, 2),
-        (0, 4),
-        (1, 3),
-        (1, 5),
-        (2, 3),
-        (2, 6),
-        (3, 7),
-        (4, 5),
-        (4, 6),
-        (5, 7),
-        (6, 7),
-    ]
-
-    if colors is None:
-        # New color palette
-        color_palette = {
-            "hex": [
-                "#8e7cc3ff",
-                "#ea9999ff",
-                "#93c47dff",
-                "#9fc5e8ff",
-                "#d55e00",
-                "#cc79a7",
-                "#c4458b",
-                "#0072b2",
-                "#f0e442",
-                "#009e73",
-            ]
-        }
-        value_to_color = {
-            cls: color_palette["hex"][i % len(color_palette["hex"])]
-            for i, cls in enumerate(unique_values)
-        }
-    else:
-        with open(colors, "r") as file:
-            obj_name_to_color = json.load(file)
-
-    for i in range(len(box_points)):
-        obj_id = int(objs[i])
-        class_name = obj_idx2name[obj_id]
-        pid = int(obj_to_pidx[i])
-        points = box_points[i]
-
-        vertices, faces = box_vertices_faces(points)
-        if class_name in [
-            "ceiling",
-            "door",
-            "doorframe",
-        ]:
-            continue
-
-        if render_shapes:
-            shape = shapes_pred[i]
-            color = obj_name_to_color.get(class_name, "#b4d4ff")
-            if i == pid:
-                s_vertices, s_faces = shape.vertices, shape.faces
-                color = "#DEDEDE"
-
-            else:
-                if box_and_angle is None:
-                    print(
-                        "fitting sdf shapes need box and angle"
-                    )  # TODO: save the use of angle
-                    raise ValueError
-                box_and_angle_i = box_and_angle[i]
-                _, denorm_shape = fit_shapes_to_box_3dfront(
-                    shape, box_and_angle_i, degrees=True
-                )
-                s_vertices, s_faces = (
-                    denorm_shape.vertices,
-                    denorm_shape.faces,
-                )  # assume shape is a trimesh obj
-            # render mesh
-            if i == len(box_points) - 1:
-                centroid = np.mean(points, axis=0)
-
-                # Compute vectors from centroid to each point
-                vectors = points - centroid
-
-                # Sort points based on y-value, z-value, and x-value
-                sorted_indices = np.lexsort(
-                    (vectors[:, 0], vectors[:, 2], vectors[:, 1])
-                )
-                points = points[sorted_indices]
-
-                for j, edge in enumerate(edges):
-                    p1, p2 = edge
-                    fig.add_trace(
-                        go.Scatter3d(
-                            x=[points[p1][0], points[p2][0]],
-                            y=[points[p1][1], points[p2][1]],
-                            z=[points[p1][2], points[p2][2]],
-                            mode="lines",
-                            legendgroup=class_name,
-                            showlegend=j == 0,
-                            name=class_name,
-                            line=dict(color=color),
-                        )
-                    )
-                fig.add_trace(
-                    go.Mesh3d(
-                        x=vertices[:, 0],
-                        y=vertices[:, 1],
-                        z=vertices[:, 2],
-                        i=faces[:, 0],
-                        j=faces[:, 1],
-                        k=faces[:, 2],
-                        color=color,
-                        opacity=0.25,
-                        name=f"{class_name}",
-                        showlegend=True,
-                    )
-                )
-            else:
-                fig.add_trace(
-                    go.Mesh3d(
-                        x=s_vertices[:, 0],
-                        y=s_vertices[:, 1],
-                        z=s_vertices[:, 2],
-                        i=s_faces[:, 0],
-                        j=s_faces[:, 1],
-                        k=s_faces[:, 2],
-                        color=color,
-                        opacity=1,
-                        name=f"{class_name}",
-                        showlegend=True,
-                    )
-                )
-                fig.update_traces(
-                    flatshading=False,
-                    lighting=dict(specular=0.8, ambient=0.6, diffuse=0.9),
-                    selector=dict(type="mesh3d"),
-                )
-        camera = dict(up=dict(x=0, y=1, z=0), eye=dict(x=2, y=10, z=-2))
-        fig.update_layout(scene_camera=camera)
-        fig.update_layout(margin=dict(r=5, l=5, b=5, t=5), height=800, width=800)
-        fig.update_layout(scene_aspectmode="data")
-        fig.update_layout(
-            scene=dict(
-                xaxis_showspikes=False,
-                yaxis_showspikes=False,
-                zaxis_showspikes=False,
-                xaxis=dict(visible=False),
-                yaxis=dict(visible=False),
-                zaxis=dict(visible=False),
-            )
-        )
-        fig.update_scenes(camera_projection_type="orthographic")
-
-        # Add bounding boxes
-        if render_boxes:
-
-            # Compute the centroid of the box_points
-
-            centroid = np.mean(points, axis=0)
-
-            # Compute vectors from centroid to each point
-            vectors = points - centroid
-
-            # Sort points based on y-value, z-value, and x-value
-            sorted_indices = np.lexsort((vectors[:, 0], vectors[:, 2], vectors[:, 1]))
-            points = points[sorted_indices]
-
-            for j, edge in enumerate(edges):
-                p1, p2 = edge
-                fig.add_trace(
-                    go.Scatter3d(
-                        x=[points[p1][0], points[p2][0]],
-                        y=[points[p1][1], points[p2][1]],
-                        z=[points[p1][2], points[p2][2]],
-                        mode="lines",
-                        legendgroup=class_name,
-                        showlegend=False,  # j == 0,
-                        name=class_name,
-                        line=dict(color=obj_name_to_color.get(class_name, "#b4d4ff")),
-                    )
-                )
-            fig.add_trace(
-                go.Mesh3d(
-                    x=vertices[:, 0],
-                    y=vertices[:, 1],
-                    z=vertices[:, 2],
-                    i=faces[:, 0],
-                    j=faces[:, 1],
-                    k=faces[:, 2],
-                    color=obj_name_to_color[class_name],
-                    opacity=0.4,
-                    name=f"{class_name}",
-                    showlegend=True,
-                )
-            )
-
-    if save_as_image:
-        print("saving image")
-        fig.write_image(filename, engine="kaleido")
-        print(f"image saved at {filename}")
-        # fig.show()
-    else:
-        fig.show()
-
-
-def render_pyrender(
-    trimesh_meshes,
-    is_show=False,
-    file_path="rendered_scene.png",
-    camera_location=[1.0, 4.0, -1],
-    up_vector=[0.0, 1.0, 0.0],
-):
-    scene = pyrender.Scene()
-    if not is_show:
-        renderer = pyrender.OffscreenRenderer(viewport_width=256, viewport_height=256)
-    for tri_mesh in trimesh_meshes:
-        pyrender_mesh = pyrender.Mesh.from_trimesh(tri_mesh, smooth=False)
-        scene.add(pyrender_mesh)
-
-    camera = pyrender.OrthographicCamera(xmag=1, ymag=1)
-
-    # Set up positions and the origin
-    camera_location = np.array(camera_location)  # y axis
-    look_at_point = np.array([0.0, 0.0, 0.0])
-    up_vector = np.array(up_vector)  # -z axis
-
-    camera_direction = (look_at_point - camera_location) / np.linalg.norm(
-        look_at_point - camera_location
-    )
-    right_vector = np.cross(camera_direction, up_vector)
-    up_vector = np.cross(right_vector, camera_direction)
-
-    camera_pose = np.identity(4)
-    camera_pose[:3, 0] = right_vector
-    camera_pose[:3, 1] = up_vector
-    camera_pose[:3, 2] = -camera_direction
-    camera_pose[:3, 3] = camera_location
-    scene.add(camera, pose=camera_pose)
-
-    light = pyrender.DirectionalLight(color=np.ones(3), intensity=2.0)
-    scene.add(light, pose=camera_pose)
-
-    point_light = pyrender.PointLight(color=np.ones(3), intensity=20.0)
-    scene.add(point_light, pose=camera_pose)
-
-    if is_show:
-        # Show the scene interactively
-        pyrender.Viewer(scene, use_raymond_lighting=True)
-    else:
-        # Render the scene to an image
-        color, _ = renderer.render(scene)
-        # Save the image to the specified file path
-        imageio.imwrite(file_path, color)
-        print(f"Image saved to {file_path}")
