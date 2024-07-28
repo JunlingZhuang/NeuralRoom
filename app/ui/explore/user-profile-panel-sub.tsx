@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import SelectInputWrapper from "@/app/ui/explore/input/select-input-wrapper";
 import TextInputWrapper from "@/app/ui/explore/input/text-input-wrapper";
 
-export default function UserProfilePanel() {
+export default function UserProfileSubPanel() {
   const [currentUserProfile, setCurrentUserProfile] = useState();
 
   return (
