@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch_scatter
 import numpy as np
 from helpers.viz_util import ROOM_HIER_MAP
 from scipy.optimize import linear_sum_assignment

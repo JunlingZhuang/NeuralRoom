@@ -1,14 +1,8 @@
-import json
-
 import torch
 import torch.nn as nn
 
 import pickle
 import os
-import glob
-
-import trimesh
-from termcolor import colored
 from model.VAEGAN_V5BOX import Sg2ScVAEModel as vae_box
 
 
