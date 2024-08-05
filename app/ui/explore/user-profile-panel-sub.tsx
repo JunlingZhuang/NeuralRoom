@@ -19,7 +19,7 @@ export default function UserProfileSubPanel() {
         <SelectInputWrapper />
         <TextInputWrapper />
       </div>
-      <UserProfileButtonGroup
+      <UserProfileButtonGroup //userprofile
         isRandomButtonVisible={false}
         LeftContentButtonLabel="Restart"
         LeftContentButtonOnClick={handleRestart}
