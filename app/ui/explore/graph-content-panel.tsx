@@ -5,6 +5,7 @@ import GraphLLMSubPanel from "@/app/ui/explore/graph-LLM-panel-sub";
 
 export default function GraphLLMContentPanel() {
   const [activeSubPanel, setActiveSubPanel] = useState("graphLLM");
+
   const renderSubPanelContent = () => {
     switch (activeSubPanel) {
       case "graphLLM":
@@ -17,16 +18,14 @@ export default function GraphLLMContentPanel() {
   };
 
   return (
-    <div className="h-full">
-      <div className="flex flex-col justify-between h-full pb-0 pt-4">
-        <div className="RenderPanel border-panel-border border-b-1 p-4 h-full">
-          {renderSubPanelContent()}
-        </div>
-        <SwitchSubTab
-          activeSubPanel={activeSubPanel}
-          setActiveSubPanel={setActiveSubPanel}
-        />
+    <div className="h-full flex flex-col">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-webkit border-b border-panel-border p-4">
+        {renderSubPanelContent()}
       </div>
+      <SwitchSubTab
+        activeSubPanel={activeSubPanel}
+        setActiveSubPanel={setActiveSubPanel}
+      />
     </div>
   );
 }

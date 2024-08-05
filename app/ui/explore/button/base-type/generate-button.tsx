@@ -22,6 +22,7 @@ interface CustomGenerateButtonProps {
   ariaLabel: string;
   startContent?: React.ReactNode;
   endContent?: React.ReactNode;
+  className?: string; 
 }
 
 export default function CustomGenerateButton({
@@ -35,6 +36,7 @@ export default function CustomGenerateButton({
   ariaLabel,
   startContent,
   endContent,
+  className, 
 }: CustomGenerateButtonProps) {
   const radiusClass = classNames({
     "rounded-none": radius === "none",
@@ -52,15 +54,13 @@ export default function CustomGenerateButton({
       color={color}
       variant={variant}
       aria-label={ariaLabel}
-      className={radiusClass}
+      className={`${radiusClass} ${className}`} 
       size={size}
       onClick={onClick}
       startContent={startContent}
       endContent={endContent}
     >
-      <span className="flex items-center space-x-2 text-black">
-        {children}
-      </span>
+      <span className="flex items-center space-x-2">{children}</span>
     </Button>
   );
 }

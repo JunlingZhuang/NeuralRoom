@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import SizeSlider from "@/app/ui/explore/button/base-type/size-slider";
-import { Button } from "@nextui-org/react";
-import Generate3DButton from "@/app/ui/explore/button/generate-3D-button";
+import Generate3DButton from "@/app/ui/explore/button/action-raidus-boarder-button";
 import { useGenerationManager } from "@/app/lib/context/generationContext";
-import { generate3DModel } from "@/app/lib/data";
 import { generate3DModel_Backend } from "@/app/lib/data";
+import { BsBox } from "react-icons/bs";
 
 export default function SizeInputButtonGroup() {
   const { modelManager } = useGenerationManager();
@@ -66,6 +65,13 @@ export default function SizeInputButtonGroup() {
             handleGenerate3DModel
             // console.log("Generate 3D Button Clicked");
           }
+          color="primary"
+          radiusSide="right-full"
+          size="lg"
+          buttonText="Generate"
+          icon={<BsBox />}
+          iconPosition="left"
+          iconSize="size-7"
         />
       </div>
     </div>

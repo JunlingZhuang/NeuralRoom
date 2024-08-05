@@ -23,7 +23,7 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background-color: black; /* 将背景颜色设置为黑色 */
+  background-color: black; 
 }
 
 /* body {

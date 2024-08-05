@@ -12,7 +12,10 @@ export default function TextInputWrapper() {
         labelPlacement="inside"
         placeholder="Describe the occupations of your family members that you think is important to the design"
         errorMessage="The description should be at least 255 characters long."
-        className="w-full"
+        classNames={{
+          base: "w-full",
+          input: "resize-y min-h-[100px]",
+        }}
       />
 
       <Textarea
@@ -23,7 +26,10 @@ export default function TextInputWrapper() {
         labelPlacement="inside"
         placeholder="Describe some social relationships that would matter in the design"
         errorMessage="The description should be at least 255 characters long."
-        className="w-full"
+        classNames={{
+          base: "w-full",
+          input: "resize-y min-h-[100px]",
+        }}
       />
     </div>
   );
