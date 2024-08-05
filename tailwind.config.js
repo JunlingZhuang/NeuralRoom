@@ -53,7 +53,32 @@ module.exports = {
       },
     }),
     plugin(function ({ addUtilities }) {
-      addUtilities({
+      const newUtilities = {
+        ".scrollbar-thin": {
+          scrollbarWidth: "none",
+          scrollbarColor: "#d4d4d4 transparent",
+        },
+        ".scrollbar-webkit": {
+          "&::-webkit-scrollbar": {
+            width: "8px",
+            height: "8px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
+            borderRadius: "10px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "white !important",
+            borderRadius: "10px",
+            border: "2px solid #4E4E4E !important",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            background: "#888 !important",
+          },
+          "&::-webkit-scrollbar-button": {
+            display: "none !important",
+          },
+        },
         ".custom-input-wrapper": {
           "@apply shadow-xl bg-inputBackGround backdrop-blur-xl backdrop-saturate-200 cursor-text":
             {},
@@ -61,7 +86,8 @@ module.exports = {
           "@apply dark:hover:bg-inputBackGround/70": {},
           "@apply dark:focus:bg-inputBackGround/80": {},
         },
-      });
+      };
+      addUtilities(newUtilities, ["responsive", "hover"]);
     }),
   ],
 };
