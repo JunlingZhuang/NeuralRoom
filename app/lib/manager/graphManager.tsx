@@ -11,7 +11,7 @@ export type Node = {
   id: number;
   programTypeIndex: number;
   programName: string;
-  color?: string;
+  nodeColor?: string;
 };
 
 export type Edge = {
@@ -58,16 +58,18 @@ export const createGraphManager = (): GraphManager => {
           programTypeIndex: node.programTypeIndex,
         });
         const programName = programInfo[0]?.programName || "Unknown Program";
+        const nodeColor = programInfo[0]?.programColor; // Default color if not found
+
         return {
           initX: Math.random() * 100,
           initY: Math.random() * 100,
           programTypeIndex: node.programTypeIndex,
           id: node.id,
           programName,
+          nodeColor,
         };
       })
     );
-    console.log("initialNode", nodes);
     const nodeMap = new Map<number, Node>();
     nodes.forEach((node: Node) => nodeMap.set(node.id, node));
 
@@ -79,8 +81,6 @@ export const createGraphManager = (): GraphManager => {
         target: nodeMap.get(edge.target),
       })
     );
-    // console.log("edges are", edges);
-    // console.log("nodes are", nodes);
     setGraph({ Nodes: nodes, Edges: edges });
   };
 
@@ -90,15 +90,13 @@ export const createGraphManager = (): GraphManager => {
 
   const formalizeGraphIntoNodesAndEdgesForBackend = () => {
     const { Nodes, Edges } = graph;
-    console.log("before node formalize", Nodes);
     const nodesData = Nodes.map((node) => node.programTypeIndex);
     const edgesData = Edges.map((edge) => [
       edge.source.id,
       edge.type,
       edge.target.id,
     ]);
-    console.log("nodesData is", nodesData);
-    console.log("edgesData is", edgesData);
+
     return { nodesData, edgesData };
   };
 
@@ -109,7 +107,7 @@ export const createGraphManager = (): GraphManager => {
   const searchProgramInfo = async (criteria: {
     programTypeIndex?: number;
     name?: string;
-    color?: string;
+    programColor?: string;
   }): Promise<ProgramInfo[]> => {
     const programColorDict = await getColorAndProgramNameDict();
     const results: ProgramInfo[] = [];
@@ -121,8 +119,8 @@ export const createGraphManager = (): GraphManager => {
           program.programTypeIndex === criteria.programTypeIndex) ||
         (criteria.name !== undefined &&
           program.programName === criteria.name) ||
-        (criteria.color !== undefined &&
-          program.programColor === criteria.color)
+        (criteria.programColor !== undefined &&
+          program.programColor === criteria.programColor)
       ) {
         results.push(program);
       }
