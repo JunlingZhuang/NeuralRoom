@@ -133,8 +133,8 @@ export const createGraphManager = (): GraphManager => {
 
   const addNode = (node: Node) => {
     setGraph((prevGraph) => ({
-      ...prevGraph,
-      Nodes: [...prevGraph.Nodes, node],
+      Nodes: [...prevGraph.Nodes, node], // 更新节点数组
+      Edges: prevGraph.Edges, // 保持边数组不变
     }));
   };
 
@@ -147,11 +147,10 @@ export const createGraphManager = (): GraphManager => {
 
   const addEdge = (edge: Edge) => {
     setGraph((prevGraph) => ({
-      ...prevGraph,
-      Edges: [...prevGraph.Edges, edge],
+      Nodes: prevGraph.Nodes, // 保持节点数组不变
+      Edges: [...prevGraph.Edges, edge], // 更新边数组
     }));
   };
-
   const deleteEdge = (edgeToDelete: Edge) => {
     setGraph((prevGraph) => ({
       ...prevGraph,

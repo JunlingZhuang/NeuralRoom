@@ -1,9 +1,10 @@
 import React from "react";
 import { Textarea } from "@nextui-org/react";
-import UserProfileButtonGroup from "@/app/ui/explore/buttonGroup/input-panel-button-group";
+import GraphLLMButtonGroup from "@/app/ui/explore/buttonGroup/input-panel-button-group";
 import { PiGraphLight } from "react-icons/pi";
 import { RiRestartLine } from "react-icons/ri";
 import GraphCanvas from "@/app/ui/explore/graph-canvas";
+
 export default function GraphLLMSubPanel() {
   const handleRestart = () => {
     console.log("Click on Restart");
@@ -31,7 +32,7 @@ export default function GraphLLMSubPanel() {
           }}
         />
       </div>
-      <UserProfileButtonGroup
+      <GraphLLMButtonGroup
         isRandomButtonVisible={true}
         LeftContentButtonLabel="Restart"
         LeftContentButtonOnClick={handleRestart}
