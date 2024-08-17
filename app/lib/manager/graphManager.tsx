@@ -11,7 +11,7 @@ export type Node = {
   id: number;
   programTypeIndex: number;
   programName: string;
-  color?: string;
+  nodeColor?: string;
 };
 
 export type Edge = {
@@ -25,8 +25,8 @@ export type Graph = {
   Edges: Edge[];
 };
 
-type ProgramInfo = {
-  index: number;
+export type ProgramInfo = {
+  programTypeIndex: number;
   programName: string;
   programColor: string;
 };
@@ -34,7 +34,7 @@ type ProgramInfo = {
 export type GraphManager = {
   graph: Graph;
   searchProgramInfo: (criteria: {
-    index?: number;
+    programTypeIndex?: number;
     name?: string;
     color?: string;
   }) => Promise<ProgramInfo[]>;
@@ -44,6 +44,7 @@ export type GraphManager = {
   deleteEdge: (edge: Edge) => void;
   updateGraph: (newGraph: Graph) => void;
   formalizeGraphIntoNodesAndEdgesForBackend: () => any;
+  getProgramDictList: () => any;
 };
 
 export const createGraphManager = (): GraphManager => {
@@ -58,16 +59,18 @@ export const createGraphManager = (): GraphManager => {
           programTypeIndex: node.programTypeIndex,
         });
         const programName = programInfo[0]?.programName || "Unknown Program";
+        const nodeColor = programInfo[0]?.programColor; // Default color if not found
+
         return {
           initX: Math.random() * 100,
           initY: Math.random() * 100,
           programTypeIndex: node.programTypeIndex,
           id: node.id,
           programName,
+          nodeColor,
         };
       })
     );
-    console.log("initialNode", nodes);
     const nodeMap = new Map<number, Node>();
     nodes.forEach((node: Node) => nodeMap.set(node.id, node));
 
@@ -79,8 +82,6 @@ export const createGraphManager = (): GraphManager => {
         target: nodeMap.get(edge.target),
       })
     );
-    // console.log("edges are", edges);
-    // console.log("nodes are", nodes);
     setGraph({ Nodes: nodes, Edges: edges });
   };
 
@@ -90,15 +91,13 @@ export const createGraphManager = (): GraphManager => {
 
   const formalizeGraphIntoNodesAndEdgesForBackend = () => {
     const { Nodes, Edges } = graph;
-    console.log("before node formalize", Nodes);
     const nodesData = Nodes.map((node) => node.programTypeIndex);
     const edgesData = Edges.map((edge) => [
       edge.source.id,
       edge.type,
       edge.target.id,
     ]);
-    console.log("nodesData is", nodesData);
-    console.log("edgesData is", edgesData);
+
     return { nodesData, edgesData };
   };
 
@@ -106,23 +105,29 @@ export const createGraphManager = (): GraphManager => {
     setGraph(newGraph);
   };
 
+  const getProgramDictList = async () => {
+    const programNameColorDict = await getColorAndProgramNameDict();
+    console.log("searchprogram result", programNameColorDict);
+    return programNameColorDict;
+  };
+
   const searchProgramInfo = async (criteria: {
     programTypeIndex?: number;
     name?: string;
-    color?: string;
+    programColor?: string;
   }): Promise<ProgramInfo[]> => {
-    const programColorDict = await getColorAndProgramNameDict();
+    const programNameColorDict = await getColorAndProgramNameDict();
     const results: ProgramInfo[] = [];
 
-    for (const key in programColorDict) {
-      const program = programColorDict[key];
+    for (const key in programNameColorDict) {
+      const program = programNameColorDict[key];
       if (
         (criteria.programTypeIndex !== undefined &&
           program.programTypeIndex === criteria.programTypeIndex) ||
         (criteria.name !== undefined &&
           program.programName === criteria.name) ||
-        (criteria.color !== undefined &&
-          program.programColor === criteria.color)
+        (criteria.programColor !== undefined &&
+          program.programColor === criteria.programColor)
       ) {
         results.push(program);
       }
@@ -130,13 +135,19 @@ export const createGraphManager = (): GraphManager => {
 
     return results.length > 0
       ? results
-      : [{ index: -1, programName: "Not Found", programColor: "#FFFFFF" }];
+      : [
+          {
+            programTypeIndex: -1,
+            programName: "Not Found",
+            programColor: "#FFFFFF",
+          },
+        ];
   };
 
   const addNode = (node: Node) => {
     setGraph((prevGraph) => ({
-      ...prevGraph,
-      Nodes: [...prevGraph.Nodes, node],
+      Nodes: [...prevGraph.Nodes, node], // update nodes list
+      Edges: prevGraph.Edges, // keep orgrinal edges list
     }));
   };
 
@@ -149,11 +160,10 @@ export const createGraphManager = (): GraphManager => {
 
   const addEdge = (edge: Edge) => {
     setGraph((prevGraph) => ({
-      ...prevGraph,
-      Edges: [...prevGraph.Edges, edge],
+      Nodes: prevGraph.Nodes, // keep orgrinal edges list
+      Edges: [...prevGraph.Edges, edge], // update edges list
     }));
   };
-
   const deleteEdge = (edgeToDelete: Edge) => {
     setGraph((prevGraph) => ({
       ...prevGraph,
@@ -170,5 +180,6 @@ export const createGraphManager = (): GraphManager => {
     addEdge,
     deleteEdge,
     updateGraph,
+    getProgramDictList,
   };
 };

@@ -19,7 +19,7 @@ export default function GraphLLMContentPanel() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-webkit border-b border-panel-border p-4">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-webkit border-b border-panel-border p-6">
         {renderSubPanelContent()}
       </div>
       <SwitchSubTab

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import SwitchTabMain from "@/app/ui/explore/switch-tab-main";
 import GraphLLMContentPanel from "@/app/ui/explore/graph-content-panel";
 import HistoryContentPanel from "@/app/ui/explore/history-content-panel";
-import SizeInputButtonGroup from "@/app/ui/explore/button/size-input-button-group";
+import SizeInputButtonGroup from "@/app/ui/explore/buttonGroup/size-input-button-group";
 
 export default function InputPanel() {
   const [activePanel, setActivePanel] = useState("graph");
