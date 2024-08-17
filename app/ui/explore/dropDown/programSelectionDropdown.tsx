@@ -12,7 +12,7 @@ interface ProgramDropdownProps {
   programList: {
     [key: string]: ProgramInfo;
   };
-  onProgramSelect: (program: ProgramInfo) => void; // 新增回调函数
+  onProgramSelect: (program: ProgramInfo) => void; 
 }
 
 const Circle = ({ color }: { color: string }) => (
@@ -35,10 +35,12 @@ export default function ProgramSelectionDropdown({
 
   useEffect(() => {
     const keys = Object.keys(programList);
+
+    // set up default selected program
     if (keys.length > 1) {
-      setSelectedKey(keys[1]); // 设置默认选中第二个选项
+      setSelectedKey(keys[1]); 
     } else if (keys.length > 0) {
-      setSelectedKey(keys[0]); // 如果只有一个选项，选中第一个
+      setSelectedKey(keys[0]); 
     }
   }, [programList]);
 
