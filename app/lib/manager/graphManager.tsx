@@ -25,8 +25,8 @@ export type Graph = {
   Edges: Edge[];
 };
 
-type ProgramInfo = {
-  index: number;
+export type ProgramInfo = {
+  programTypeIndex: number;
   programName: string;
   programColor: string;
 };
@@ -34,7 +34,7 @@ type ProgramInfo = {
 export type GraphManager = {
   graph: Graph;
   searchProgramInfo: (criteria: {
-    index?: number;
+    programTypeIndex?: number;
     name?: string;
     color?: string;
   }) => Promise<ProgramInfo[]>;
@@ -44,6 +44,7 @@ export type GraphManager = {
   deleteEdge: (edge: Edge) => void;
   updateGraph: (newGraph: Graph) => void;
   formalizeGraphIntoNodesAndEdgesForBackend: () => any;
+  getProgramDictList: () => any;
 };
 
 export const createGraphManager = (): GraphManager => {
@@ -104,16 +105,22 @@ export const createGraphManager = (): GraphManager => {
     setGraph(newGraph);
   };
 
+  const getProgramDictList = async () => {
+    const programNameColorDict = await getColorAndProgramNameDict();
+    console.log("searchprogram result", programNameColorDict);
+    return programNameColorDict;
+  };
+
   const searchProgramInfo = async (criteria: {
     programTypeIndex?: number;
     name?: string;
     programColor?: string;
   }): Promise<ProgramInfo[]> => {
-    const programColorDict = await getColorAndProgramNameDict();
+    const programNameColorDict = await getColorAndProgramNameDict();
     const results: ProgramInfo[] = [];
 
-    for (const key in programColorDict) {
-      const program = programColorDict[key];
+    for (const key in programNameColorDict) {
+      const program = programNameColorDict[key];
       if (
         (criteria.programTypeIndex !== undefined &&
           program.programTypeIndex === criteria.programTypeIndex) ||
@@ -128,13 +135,19 @@ export const createGraphManager = (): GraphManager => {
 
     return results.length > 0
       ? results
-      : [{ index: -1, programName: "Not Found", programColor: "#FFFFFF" }];
+      : [
+          {
+            programTypeIndex: -1,
+            programName: "Not Found",
+            programColor: "#FFFFFF",
+          },
+        ];
   };
 
   const addNode = (node: Node) => {
     setGraph((prevGraph) => ({
-      Nodes: [...prevGraph.Nodes, node], // 更新节点数组
-      Edges: prevGraph.Edges, // 保持边数组不变
+      Nodes: [...prevGraph.Nodes, node], // update nodes list
+      Edges: prevGraph.Edges, // keep orgrinal edges list
     }));
   };
 
@@ -147,8 +160,8 @@ export const createGraphManager = (): GraphManager => {
 
   const addEdge = (edge: Edge) => {
     setGraph((prevGraph) => ({
-      Nodes: prevGraph.Nodes, // 保持节点数组不变
-      Edges: [...prevGraph.Edges, edge], // 更新边数组
+      Nodes: prevGraph.Nodes, // keep orgrinal edges list
+      Edges: [...prevGraph.Edges, edge], // update edges list
     }));
   };
   const deleteEdge = (edgeToDelete: Edge) => {
@@ -167,5 +180,6 @@ export const createGraphManager = (): GraphManager => {
     addEdge,
     deleteEdge,
     updateGraph,
+    getProgramDictList,
   };
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dropdown,
   DropdownTrigger,
@@ -6,12 +6,14 @@ import {
   DropdownItem,
   Button,
 } from "@nextui-org/react";
+import { ProgramInfo } from "@/app/lib/manager/graphManager";
 
-const options = [
-  { key: "livingroom", color: "#94CDE9" },
-  { key: "kitchen", color: "#978BA0" },
-  { key: "bed", color: "#fed9ed" },
-];
+interface ProgramDropdownProps {
+  programList: {
+    [key: string]: ProgramInfo;
+  };
+  onProgramSelect: (program: ProgramInfo) => void; // 新增回调函数
+}
 
 const Circle = ({ color }: { color: string }) => (
   <div
@@ -25,8 +27,33 @@ const Circle = ({ color }: { color: string }) => (
   />
 );
 
-export default function ProgramSelectionDropdown() {
-  const [selectedKey, setSelectedKey] = React.useState("livingroom");
+export default function ProgramSelectionDropdown({
+  programList,
+  onProgramSelect,
+}: ProgramDropdownProps) {
+  const [selectedKey, setSelectedKey] = React.useState<string>("");
+
+  useEffect(() => {
+    const keys = Object.keys(programList);
+    if (keys.length > 1) {
+      setSelectedKey(keys[1]); // 设置默认选中第二个选项
+    } else if (keys.length > 0) {
+      setSelectedKey(keys[0]); // 如果只有一个选项，选中第一个
+    }
+  }, [programList]);
+
+  useEffect(() => {
+    if (selectedKey) {
+      const selectedProgram = programList[selectedKey];
+      onProgramSelect(selectedProgram);
+      console.log("Current select program is", selectedProgram);
+    }
+  }, [selectedKey, programList, onProgramSelect]);
+
+  const options = Object.entries(programList).map(([key, info]) => ({
+    key: key as string,
+    color: info.programColor,
+  }));
 
   const selectedOption = options.find((option) => option.key === selectedKey);
 
@@ -38,7 +65,9 @@ export default function ProgramSelectionDropdown() {
             {selectedOption && (
               <div className="flex items-center">
                 <Circle color={selectedOption.color} />
-                <span className="ml-2">{selectedOption.key}</span>
+                <span className="ml-2">
+                  {programList[selectedOption.key]?.programName}
+                </span>
               </div>
             )}
           </Button>
@@ -56,10 +85,11 @@ export default function ProgramSelectionDropdown() {
         >
           {options.map((option) => (
             <DropdownItem
+              className="text-white"
               key={option.key}
               startContent={<Circle color={option.color} />}
             >
-              {option.key}
+              {programList[option.key]?.programName}
             </DropdownItem>
           ))}
         </DropdownMenu>

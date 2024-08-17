@@ -1,7 +1,7 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import { useGenerationManager } from "@/app/lib/context/generationContext";
-import { Node, Edge } from "@/app/lib/manager/graphManager";
+import { Node, Edge, ProgramInfo } from "@/app/lib/manager/graphManager";
 import ProgramDropdown from "@/app/ui/explore/dropDown/programSelectionDropdown";
 
 // extend node type to add property to align the d3 features
@@ -17,6 +17,29 @@ export default function GraphCanvas() {
   const graphData = graphManager.graph;
   const nodesData = graphData.Nodes as NodeWithCoords[];
   const edgesData = graphData.Edges;
+
+  const [currentSelectedProgram, setCurrentSelectedProgram] =
+    useState<ProgramInfo | null>(null);
+
+  const getProgramListFromManager = async (): Promise<{
+    [key: number]: ProgramInfo;
+  }> => {
+    const programList = await graphManager.getProgramDictList();
+    return programList;
+  };
+
+  const [programList, setProgramList] = useState<{
+    [key: number]: ProgramInfo;
+  }>({});
+
+  useEffect(() => {
+    const fetchProgramList = async () => {
+      const list = await getProgramListFromManager();
+      setProgramList(list);
+    };
+
+    fetchProgramList();
+  }, []);
 
   const nodeTransition = 250;
   const edgeTransition = 100;
@@ -97,14 +120,15 @@ export default function GraphCanvas() {
           .on("drag", (event, d) => dragged(event, d))
           .on("end", (event, d) => dragended(event, d))
       );
+    const actualNodeRadius = 8;
+    const displayNodeRadius = 12;
 
     const actualNode = node
       .append("circle")
-      .attr("r", 8)
+      .attr("r", actualNodeRadius)
       .attr("fill", (d: NodeWithCoords) => d.nodeColor || "#FFFFFF")
       .attr("stroke", "white")
       .attr("stroke-width", 1);
-
     node
       .append("circle")
       .attr("r", 20)
@@ -115,7 +139,7 @@ export default function GraphCanvas() {
           d3.select(previousNode)
             .transition()
             .duration(nodeTransition)
-            .attr("r", 12)
+            .attr("r", displayNodeRadius)
             .attr("stroke-width", 2)
             .attr("stroke", "white");
         }
@@ -154,7 +178,7 @@ export default function GraphCanvas() {
             }))
           )
           .id((d: any) => d.id)
-          .distance(100)
+          .distance(50)
       )
       .force("charge", d3.forceManyBody().strength(-200))
       .force(
@@ -166,6 +190,9 @@ export default function GraphCanvas() {
       );
 
     simulation.on("tick", () => {
+      const width = (canvasRef.current as any)?.clientWidth;
+      const height = (canvasRef.current as any)?.clientHeight;
+
       link
         .selectAll("line")
         .attr("x1", (d: any) => (d.source as NodeWithCoords).x || 0)
@@ -173,7 +200,18 @@ export default function GraphCanvas() {
         .attr("x2", (d: any) => (d.target as NodeWithCoords).x || 0)
         .attr("y2", (d: any) => (d.target as NodeWithCoords).y || 0);
 
-      node.attr("transform", (d: any) => `translate(${d.x || 0},${d.y || 0})`);
+      node.attr("transform", (d: any) => {
+        // Constrain nodes within 0.9 of the canvas boundaries, considering radius
+        d.x = Math.max(
+          displayNodeRadius,
+          Math.min(0.9 * width - displayNodeRadius, d.x || 0)
+        );
+        d.y = Math.max(
+          displayNodeRadius,
+          Math.min(0.9 * height - displayNodeRadius, d.y || 0)
+        );
+        return `translate(${d.x},${d.y})`;
+      });
     });
 
     simulationRef.current = simulation;
@@ -225,9 +263,9 @@ export default function GraphCanvas() {
           initX: event.x,
           initY: event.y,
           id: nodesData.length,
-          programTypeIndex: 11,
-          programName: "kitchen",
-          nodeColor: "#94CDE9",
+          programTypeIndex: currentSelectedProgram?.programTypeIndex || 11,
+          programName: currentSelectedProgram?.programName || "kitchen",
+          nodeColor: currentSelectedProgram?.programColor || "#94CDE9",
           x: event.x,
           y: event.y,
         } as NodeWithCoords;
@@ -240,19 +278,12 @@ export default function GraphCanvas() {
           .attr("fill", "transparent")
           .attr("stroke", "white")
           .attr("stroke-width", 1)
-          // .attr("stroke-dasharray", "0 16 0 48")
           .attr("cx", event.x)
           .attr("cy", event.y);
       } else {
         newNode.x = event.x;
         newNode.y = event.y;
         svg.selectAll(".temp-node").attr("cx", event.x).attr("cy", event.y);
-
-        console.log("Updated newNode position:", newNode);
-        console.log(
-          "Temporary node element:",
-          svg.selectAll(".temp-node").node()
-        );
       }
     }
 
@@ -262,9 +293,6 @@ export default function GraphCanvas() {
       d.fx = null;
       d.fy = null;
 
-      console.log("Final new node at end of drag:", newNode);
-
-      // when cursor release, add new node to graphManager
       if (newNode) {
         graphManager.addNode(newNode);
         graphManager.addEdge({ type: 3, source: d, target: newNode });
@@ -281,20 +309,23 @@ export default function GraphCanvas() {
 
         simulationRef.current?.alpha(1).restart();
         newNode = null;
-
-        console.log("New node added to nodesData:", nodesData);
       }
     }
-  }, [graphManager.graph.Nodes, graphManager.graph.Edges]);
+  }, [
+    graphManager.graph.Nodes,
+    graphManager.graph.Edges,
+    currentSelectedProgram,
+  ]);
 
   return (
     <div
       ref={canvasRef}
       className="GraphCanvas shadow-2xl rounded-[16px] backdrop-blur-xl w-full h-96 bg-panel-bg bg-opacity-60 justify-center relative"
     >
-      <ProgramDropdown />
-      {/* </ProgramDropdown className="absolute top-0 right-0 m-4 p-2 bg-white text-black rounded">
-      > */}
+      <ProgramDropdown
+        programList={programList}
+        onProgramSelect={setCurrentSelectedProgram}
+      />
     </div>
   );
 }
