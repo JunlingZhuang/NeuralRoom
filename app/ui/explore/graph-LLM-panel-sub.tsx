@@ -1,8 +1,9 @@
 import React , { useState }from "react";
 import { Textarea } from "@nextui-org/react";
-import UserProfileButtonGroup from "@/app/ui/explore/buttonGroup/input-panel-button-group";
+import GraphLLMButtonGroup from "@/app/ui/explore/buttonGroup/input-panel-button-group";
 import { PiGraphLight } from "react-icons/pi";
 import { RiRestartLine } from "react-icons/ri";
+import GraphCanvas from "@/app/ui/explore/graph-canvas";
 
 export default function GraphLLMSubPanel() {
   const [textareaValue, setTextareaValue] = useState("");
@@ -37,7 +38,7 @@ export default function GraphLLMSubPanel() {
     <div className="flex flex-col h-full space-y-5 w-full max-w-full justify-between">
       <div className="graphLLMContaniner flex-col space-y-5">
         <div className="flex text-lg justify-center">Graph</div>
-        <div className=" GraphCanvas flex w-full h-96 bg-white justify-center"></div>
+        <GraphCanvas />
         <Textarea
           isInvalid={false}
           key="bordered"
@@ -55,7 +56,7 @@ export default function GraphLLMSubPanel() {
           onChange={handleTextareaChange} // Capture input changes
         />
       </div>
-      <UserProfileButtonGroup
+      <GraphLLMButtonGroup
         isRandomButtonVisible={true}
         LeftContentButtonLabel="Restart"
         LeftContentButtonOnClick={handleRestart}
