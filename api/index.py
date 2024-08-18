@@ -114,9 +114,8 @@ def generate_graph():
         return jsonify({"error": "OpenAI requests failed"}), 404
 
     response = {
-        "message": "text2graph generated successfully",
-        "nodes_data": room_list,
-        "edges_data": adj_list,
+        "nodes": room_list,  # a list of program type index
+        "edges": adj_list,  # a list of [source id,type,target id]
     }
 
     return jsonify(response)

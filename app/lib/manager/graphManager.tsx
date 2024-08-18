@@ -43,6 +43,7 @@ export type GraphManager = {
   addEdge: (edge: Edge) => void;
   deleteEdge: (edge: Edge) => void;
   updateGraph: (newGraph: Graph) => void;
+  fetchLLMGraphData:(response:{nodes:number[];edges:[number, number, number][]}) => void;
   formalizeGraphIntoNodesAndEdgesForBackend: () => any;
   getProgramDictList: () => any;
 };
@@ -88,6 +89,44 @@ export const createGraphManager = (): GraphManager => {
   useEffect(() => {
     initializeGraph();
   }, []);
+
+  const fetchLLMGraphData = async (response:{nodes:number[];edges:[number, number, number][]}) => {
+    const {nodes: nodeTypeIndexes, edges:edgesData} = response;
+    // process nodes
+    const nodes = await Promise.all(nodeTypeIndexes.map( async (programTypeIndex, id)=>{
+      const programInfo = await searchProgramInfo({programTypeIndex:programTypeIndex});
+      const programName = programInfo[0]?.programName || "Unknown Program";
+      const nodeColor = programInfo[0]?.programColor; // Default color if not found
+      return {
+          initX: Math.random() * 100,
+          initY: Math.random() * 100,
+          programTypeIndex: programTypeIndex,
+          id: id,
+          programName,
+          nodeColor,
+        };
+    }))
+    const nodeMap = new Map<number, Node>();
+    nodes.forEach((node: Node) => nodeMap.set(node.id, node));
+
+    // Process edges
+    const edges = edgesData.map(([sourceId, type, targetId]) => {
+      const sourceNode = nodeMap.get(sourceId);
+      const targetNode = nodeMap.get(targetId);
+
+      if (!sourceNode || !targetNode) {
+        throw new Error(`Node not found for edge: ${sourceId} -> ${targetId}`);
+      }
+
+      return {
+        type,
+        source: sourceNode,
+        target: targetNode,
+      };
+    });
+
+    setGraph({ Nodes: nodes, Edges: edges });
+  };
 
   const formalizeGraphIntoNodesAndEdgesForBackend = () => {
     const { Nodes, Edges } = graph;
@@ -173,6 +212,7 @@ export const createGraphManager = (): GraphManager => {
 
   return {
     graph,
+    fetchLLMGraphData,
     formalizeGraphIntoNodesAndEdgesForBackend,
     searchProgramInfo,
     addNode,

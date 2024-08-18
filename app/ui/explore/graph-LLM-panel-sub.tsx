@@ -4,9 +4,11 @@ import GraphLLMButtonGroup from "@/app/ui/explore/buttonGroup/input-panel-button
 import { PiGraphLight } from "react-icons/pi";
 import { RiRestartLine } from "react-icons/ri";
 import GraphCanvas from "@/app/ui/explore/graph-canvas";
+import { useGenerationManager } from "@/app/lib/context/generationContext";
 
 export default function GraphLLMSubPanel() {
   const [textareaValue, setTextareaValue] = useState("");
+  const { graphManager } = useGenerationManager();
   const handleRestart = () => {
     console.log("Click on Restart");
   };
@@ -27,6 +29,9 @@ export default function GraphLLMSubPanel() {
       if (response.ok) {
         const data = await response.json();
         console.log("Backend graph:", data);
+        // Use fetchLLMGraphData to process the received data and update the graph
+        await graphManager.fetchLLMGraphData(data);
+
       } else {
         console.error("Failed to send data to the backend.");
       }
