@@ -37,7 +37,8 @@ def process_LLM_output(classes_dict, rel_dict, LLM_output=None):
 
 
 def make_LLM_request(input, classes_dict, rel_dict):
-    client = OpenAI()
+    api_key = os.getenv("OPENAI_API_KEY")
+    client = OpenAI(api_key=api_key)
     sysprompt = make_basic_sysprompt()
     input = make_basic_input_prompt(input)
 
@@ -51,10 +52,8 @@ def make_LLM_request(input, classes_dict, rel_dict):
     )
 
     LLM_output = completion.choices[0].message.parsed
-    print(LLM_output)
 
     room_list, adj_list = process_LLM_output(
         classes_dict, rel_dict, LLM_output=LLM_output
     )
-    print("processed output", room_list, adj_list)
     return room_list, adj_list

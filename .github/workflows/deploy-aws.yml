@@ -34,6 +34,7 @@ jobs:
           file: flask.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/flask:latest
+          build-args: OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
 
   deploy:
     runs-on: ubuntu-latest

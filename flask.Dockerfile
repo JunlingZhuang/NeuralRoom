@@ -21,6 +21,12 @@ RUN pip install -r requirements.txt
 # Install gunicorn
 RUN pip install gunicorn
 
+# Accept the OpenAI API key as a build argument
+ARG OPENAI_API_KEY
+
+# Set the OpenAI API key as an environment variable
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
+
 # Copy Flask application
 COPY api ./api
 
