@@ -22,8 +22,6 @@ global_count = 0
 dataset = None
 model = None
 args = None
-LLMnodesData = None
-LLMedgesData = None
 
 gt_dir = os.path.join(current_dir, "test/new_prior_1500_GT")
 args_location = os.path.join(current_dir, "test/new_prior_1500/args.json")
@@ -57,9 +55,6 @@ def generate_model():
     data = request.get_json()
     nodesData = data.get("nodes")
     edgesData = data.get("edges")
-    # test LLM graph data
-    nodesData = LLMnodesData
-    edgesData = LLMedgesData
     length = data.get("length")
     height = data.get("height")
     width = data.get("width")
@@ -101,10 +96,6 @@ def generate_graph():
     rel_dict = dataset.relationships_dict
     try:
         room_list, adj_list = make_LLM_request(text_value, classes_dict, rel_dict)
-        global LLMnodesData
-        global LLMedgesData
-        LLMnodesData = room_list
-        LLMedgesData = adj_list
 
         # Process the text_value as needed
         print(f"room_list {room_list}")
