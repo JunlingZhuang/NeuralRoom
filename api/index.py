@@ -111,6 +111,10 @@ def generate_graph():
 
     return jsonify(response)
 
+@app.route("/api/openai", methods = ["GET"])
+def get_openAIApiKey():
+    apikey = os.getenv("OPENAI_API_KEY")
+    return jsonify({"Open AI Apikey": apikey})
 
 @app.route("/health", methods=["GET"])
 def health_check():
