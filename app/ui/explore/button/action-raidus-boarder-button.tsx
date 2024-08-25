@@ -4,7 +4,7 @@ import CustomGenerateButton from "@/app/ui/explore/button/base-type/generate-but
 
 interface Generate3DButtonProps {
   onClick: () => void;
-  isLoading: boolean;
+  isLoading?: boolean; // Make isLoading optional
   color: string;
   radiusSide: "none" | "sm" | "md" | "lg" | "full" | "left-full" | "right-full";
   size: "sm" | "md" | "lg";
@@ -16,7 +16,7 @@ interface Generate3DButtonProps {
 
 export default function Generate3DButton({
   onClick,
-  isLoading,
+  isLoading = false, // Default to false if isLoading is not provided
   color,
   radiusSide,
   size,

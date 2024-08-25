@@ -1,44 +1,45 @@
-import React , { useState }from "react";
+import React, { useState } from "react";
 import { Textarea } from "@nextui-org/react";
 import GraphLLMButtonGroup from "@/app/ui/explore/buttonGroup/input-panel-button-group";
 import { PiGraphLight } from "react-icons/pi";
 import { RiRestartLine } from "react-icons/ri";
 import GraphCanvas from "@/app/ui/explore/graph-canvas";
 import { useGenerationManager } from "@/app/lib/context/generationContext";
+import { generateGraph_Backend } from "@/app/lib/data";
+import { Graph } from "@/app/lib/manager/graphManager";
 
 export default function GraphLLMSubPanel() {
-  const [textareaValue, setTextareaValue] = useState("");
+  const [primaryPrompt, setPrimaryPrompt] = useState("");
   const { graphManager } = useGenerationManager();
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleRestart = () => {
     console.log("Click on Restart");
   };
-  const handleTextareaChange = (e) => {
-    setTextareaValue(e.target.value);
+
+  const handleTextareaChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setPrimaryPrompt(e.target.value);
   };
-  const handleGenerateGraph = async ()  => {
-    console.log("Textarea content:", textareaValue);
+
+  const handleGenerateGraph = async () => {
+    setIsLoading(true);
+    console.log("Textarea content:", primaryPrompt);
     try {
-      const response = await fetch('/api/text2graph', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text: textareaValue }), // Sending the textarea value as JSON
-      });
+      const rawGraphData = await generateGraph_Backend(primaryPrompt);
+      const newGraph: Graph = await graphManager.handleGeneratedGraphData(
+        rawGraphData
+      );
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Backend graph:", data);
-        // Use fetchLLMGraphData to process the received data and update the graph
-        await graphManager.fetchLLMGraphData(data);
-
-      } else {
-        console.error("Failed to send data to the backend.");
-      }
+      graphManager.updateGraph(newGraph);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
   return (
     <div className="flex flex-col h-full space-y-5 w-full max-w-full justify-between">
       <div className="graphLLMContaniner flex-col space-y-5">
@@ -57,11 +58,12 @@ export default function GraphLLMSubPanel() {
             base: "w-full",
             input: "resize-y min-h-[120px] max-h-[120px]",
           }}
-          value={textareaValue}
+          value={primaryPrompt}
           onChange={handleTextareaChange} // Capture input changes
         />
       </div>
       <GraphLLMButtonGroup
+        isLoading={isLoading}
         isRandomButtonVisible={true}
         LeftContentButtonLabel="Restart"
         LeftContentButtonOnClick={handleRestart}

@@ -53,20 +53,6 @@ export async function fetchUserProfilePersonaOptions(): Promise<
   return await response.json();
 }
 
-// data.tsx
-export const generate3DModel = async (boxSize: {
-  length: number;
-  width: number;
-  height: number;
-}) => {
-  try {
-    return "test.fbx";
-  } catch (error) {
-    console.error("Error generating 3D model:", error);
-    throw error;
-  }
-};
-
 export const generate3DModel_Backend = async (
   formalizedGraph: any,
   boxSize: {
@@ -108,5 +94,28 @@ export const generate3DModel_Backend = async (
   } catch (error) {
     console.error("Error generating 3D model:", error);
     throw error;
+  }
+};
+
+export const generateGraph_Backend = async (primaryPrompt: string) => {
+  try {
+    const response = await fetch("/api/text2graph", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text: primaryPrompt }), // Sending the textarea value as JSON
+    });
+
+    if (response.ok) {
+      const generatedGraphdata = await response.json();
+      console.log("Backend graph:", generatedGraphdata);
+      // Use fetchLLMGraphData to process the received data and update the graph
+      return generatedGraphdata;
+    } else {
+      console.error("Failed to send data to the backend.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
   }
 };
