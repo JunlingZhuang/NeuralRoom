@@ -13,6 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Verify OPENAI_API_KEY
+        run: echo "OPENAI_API_KEY starts with: ${OPENAI_API_KEY:0:4}"
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -34,8 +39,9 @@ jobs:
           file: flask.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/flask:latest
-          build-args: OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-
+          build-args: |
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            
   deploy:
     runs-on: ubuntu-latest
     needs: build

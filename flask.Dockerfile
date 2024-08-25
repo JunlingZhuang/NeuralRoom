@@ -35,4 +35,6 @@ ENV FLASK_ENV production
 EXPOSE 5328
 
 # Start the Flask server using gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5328", "api.index:app"]
+CMD echo "OPENAI_API_KEY: $OPENAI_API_KEY" && gunicorn --bind 0.0.0.0:5328 api.index:app
+
+# CMD ["gunicorn", "--bind", "0.0.0.0:5328", "api.index:app"]
