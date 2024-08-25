@@ -7,6 +7,7 @@ import RandomButton from "@/app/ui/explore/button/base-type/icon-only-button";
 import { CgDice5 } from "react-icons/cg";
 
 interface InputPanelButtonGroupProps {
+  isLoading: boolean;
   isRandomButtonVisible: boolean;
   LeftContentButtonLabel: string;
   LeftContentButtonOnClick: () => void;
@@ -17,6 +18,7 @@ interface InputPanelButtonGroupProps {
 }
 
 export default function InputPanelButtonGroup({
+  isLoading,
   isRandomButtonVisible,
   LeftContentButtonLabel,
   LeftContentButtonOnClick,
@@ -25,8 +27,6 @@ export default function InputPanelButtonGroup({
   RightContentButtonOnClick,
   RightContentButtonIcon,
 }: InputPanelButtonGroupProps) {
-  const [isLoading, setIsLoading] = useState(false);
-
   const handleRandomInput = () => {
     console.log("Click on Random input");
   };
@@ -50,7 +50,6 @@ export default function InputPanelButtonGroup({
       </div>
       <div className="function-button-group gap-1 flex flex-row">
         <Generate3DButton
-          isLoading={isLoading}
           onClick={LeftContentButtonOnClick}
           color="secondary"
           radiusSide="left-full"

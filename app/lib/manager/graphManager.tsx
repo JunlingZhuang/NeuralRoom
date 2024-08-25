@@ -43,7 +43,10 @@ export type GraphManager = {
   addEdge: (edge: Edge) => void;
   deleteEdge: (edge: Edge) => void;
   updateGraph: (newGraph: Graph) => void;
-  fetchLLMGraphData:(response:{nodes:number[];edges:[number, number, number][]}) => void;
+  handleGeneratedGraphData: (response: {
+    nodes: number[];
+    edges: [number, number, number][];
+  }) => Promise<Graph>;
   formalizeGraphIntoNodesAndEdgesForBackend: () => any;
   getProgramDictList: () => any;
 };
@@ -51,11 +54,12 @@ export type GraphManager = {
 export const createGraphManager = (): GraphManager => {
   const [graph, setGraph] = useState<Graph>({ Nodes: [], Edges: [] });
 
-  const initializeGraph = async () => {
-    const nodesJson = await fetchSampleNodehData();
-
+  const formalizeRawNodesAndEdgesData = async (
+    nodeData: { id: number; programTypeIndex: number }[],
+    edgeData: { type: number; source: number; target: number }[]
+  ): Promise<Graph> => {
     const nodes = await Promise.all(
-      nodesJson.map(async (node: { id: number; programTypeIndex: number }) => {
+      nodeData.map(async (node) => {
         const programInfo = await searchProgramInfo({
           programTypeIndex: node.programTypeIndex,
         });
@@ -72,60 +76,68 @@ export const createGraphManager = (): GraphManager => {
         };
       })
     );
-    const nodeMap = new Map<number, Node>();
-    nodes.forEach((node: Node) => nodeMap.set(node.id, node));
 
-    const edgesJson = await fetchSampleEdgeData();
-    const edges = edgesJson.map(
-      (edge: { type: number; source: number; target: number }) => ({
-        type: edge.type,
-        source: nodeMap.get(edge.source),
-        target: nodeMap.get(edge.target),
+    const nodeMap = new Map<number, Node>();
+    nodes.forEach((node) => nodeMap.set(node.id, node));
+
+    const edges = edgeData
+      .map((edge) => {
+        const sourceNode = nodeMap.get(edge.source);
+        const targetNode = nodeMap.get(edge.target);
+
+        if (!sourceNode || !targetNode) {
+          return null; // Filter out invalid edges
+        }
+
+        return {
+          type: edge.type,
+          source: sourceNode,
+          target: targetNode,
+        };
       })
+      .filter((edge): edge is Edge => edge !== null);
+
+    return { Nodes: nodes, Edges: edges }; // 返回新的 Graph 对象
+  };
+
+  const initializeGraph = async () => {
+    const nodesJson = await fetchSampleNodehData();
+    const edgesJson = await fetchSampleEdgeData();
+
+    const initialGraph = await formalizeRawNodesAndEdgesData(
+      nodesJson.map((node: { id: number; programTypeIndex: number }) => ({
+        id: node.id,
+        programTypeIndex: node.programTypeIndex,
+      })),
+      edgesJson
     );
-    setGraph({ Nodes: nodes, Edges: edges });
+    updateGraph(initialGraph);
   };
 
   useEffect(() => {
     initializeGraph();
   }, []);
 
-  const fetchLLMGraphData = async (response:{nodes:number[];edges:[number, number, number][]}) => {
-    const {nodes: nodeTypeIndexes, edges:edgesData} = response;
-    // process nodes
-    const nodes = await Promise.all(nodeTypeIndexes.map( async (programTypeIndex, id)=>{
-      const programInfo = await searchProgramInfo({programTypeIndex:programTypeIndex});
-      const programName = programInfo[0]?.programName || "Unknown Program";
-      const nodeColor = programInfo[0]?.programColor; // Default color if not found
-      return {
-          initX: Math.random() * 100,
-          initY: Math.random() * 100,
-          programTypeIndex: programTypeIndex,
-          id: id,
-          programName,
-          nodeColor,
-        };
-    }))
-    const nodeMap = new Map<number, Node>();
-    nodes.forEach((node: Node) => nodeMap.set(node.id, node));
+  const handleGeneratedGraphData = async (response: {
+    nodes: number[];
+    edges: [number, number, number][];
+  }): Promise<Graph> => {
+    // Ensure the return type is Promise<Graph>
+    const nodesData = response.nodes.map((programTypeIndex, id) => ({
+      id,
+      programTypeIndex,
+    }));
+    const edgesData = response.edges.map(([source, type, target]) => ({
+      source,
+      type,
+      target,
+    }));
 
-    // Process edges
-    const edges = edgesData.map(([sourceId, type, targetId]) => {
-      const sourceNode = nodeMap.get(sourceId);
-      const targetNode = nodeMap.get(targetId);
-
-      if (!sourceNode || !targetNode) {
-        throw new Error(`Node not found for edge: ${sourceId} -> ${targetId}`);
-      }
-
-      return {
-        type,
-        source: sourceNode,
-        target: targetNode,
-      };
-    });
-
-    setGraph({ Nodes: nodes, Edges: edges });
+    const generatedGraph: Graph = await formalizeRawNodesAndEdgesData(
+      nodesData,
+      edgesData
+    );
+    return generatedGraph;
   };
 
   const formalizeGraphIntoNodesAndEdgesForBackend = () => {
@@ -212,7 +224,7 @@ export const createGraphManager = (): GraphManager => {
 
   return {
     graph,
-    fetchLLMGraphData,
+    handleGeneratedGraphData,
     formalizeGraphIntoNodesAndEdgesForBackend,
     searchProgramInfo,
     addNode,

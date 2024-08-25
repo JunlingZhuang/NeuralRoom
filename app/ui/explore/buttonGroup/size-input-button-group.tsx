@@ -25,7 +25,7 @@ export default function SizeInputButtonGroup() {
       console.log("Backend Graph Data is", formalizedGraph);
       console.log("Backend Model Size is", modelSize);
 
-      // 将模型数据转换为 Blob 对象
+      // convert moddel to Blob object
       const objBlob = new Blob([modelBlob], { type: "model/obj" });
       modelManager.updateModel(objBlob);
     } catch (error) {
