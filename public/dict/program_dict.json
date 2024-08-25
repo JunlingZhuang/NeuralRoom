@@ -6,51 +6,26 @@
   },
   "1": {
     "programTypeIndex": 1,
-    "programColor": "#B2C193",
-    "programName": "balcony"
-  },
-  "2": {
-    "programTypeIndex": 2,
     "programColor": "#CACACA",
     "programName": "bathroom"
   },
   "3": {
     "programTypeIndex": 3,
-    "programColor": "#fed9ed",
-    "programName": "bed"
-  },
-  "4": {
-    "programTypeIndex": 4,
     "programColor": "#B29494",
     "programName": "bedroom"
   },
-  "5": {
-    "programTypeIndex": 5,
-    "programColor": "#627DA5",
-    "programName": "cabinet"
-  },
   "6": {
     "programTypeIndex": 6,
-    "programColor": "#B7AFD0",
-    "programName": "chair"
-  },
-  "7": {
-    "programTypeIndex": 7,
     "programColor": "#B2C193",
     "programName": "circulation"
   },
-  "8": {
-    "programTypeIndex": 8,
+  "7": {
+    "programTypeIndex": 7,
     "programColor": "#B2C193",
     "programName": "courtyard"
   },
   "9": {
     "programTypeIndex": 9,
-    "programColor": "#79D4BC",
-    "programName": "desk"
-  },
-  "10": {
-    "programTypeIndex": 10,
     "programColor": "#BAB8E2",
     "programName": "diningroom"
   },
@@ -69,34 +44,14 @@
     "programColor": "#978BA0",
     "programName": "livingroom"
   },
-  "14": {
-    "programTypeIndex": 14,
-    "programColor": "#8ddfcb",
-    "programName": "nightstand"
-  },
   "15": {
     "programTypeIndex": 15,
     "programColor": "#CACACA",
     "programName": "service"
   },
-  "16": {
-    "programTypeIndex": 16,
-    "programColor": "#ea9999",
-    "programName": "sofa"
-  },
   "17": {
     "programTypeIndex": 17,
     "programColor": "#CACACA",
     "programName": "storage"
-  },
-  "18": {
-    "programTypeIndex": 18,
-    "programColor": "#F0A5A5",
-    "programName": "table"
-  },
-  "19": {
-    "programTypeIndex": 19,
-    "programColor": "#627DA5",
-    "programName": "wardrobe"
   }
 }

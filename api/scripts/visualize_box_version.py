@@ -288,6 +288,7 @@ def generate_queried_unit_mesh(
         sdf_dir,
         retrieve_sdf=False,  # export box only meshes
         ceiling_and_floor=False,
+        substract_room=True,
     )
     exp_dir = os.path.join(args["exp"], "mesh")
     mesh_name = "test.obj"

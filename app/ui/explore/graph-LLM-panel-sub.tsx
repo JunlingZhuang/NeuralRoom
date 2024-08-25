@@ -1,16 +1,43 @@
-import React from "react";
+import React , { useState }from "react";
 import { Textarea } from "@nextui-org/react";
 import GraphLLMButtonGroup from "@/app/ui/explore/buttonGroup/input-panel-button-group";
 import { PiGraphLight } from "react-icons/pi";
 import { RiRestartLine } from "react-icons/ri";
 import GraphCanvas from "@/app/ui/explore/graph-canvas";
+import { useGenerationManager } from "@/app/lib/context/generationContext";
 
 export default function GraphLLMSubPanel() {
+  const [textareaValue, setTextareaValue] = useState("");
+  const { graphManager } = useGenerationManager();
   const handleRestart = () => {
     console.log("Click on Restart");
   };
-  const handleGenerateGraph = () => {
-    console.log("Click on Generate Graph");
+  const handleTextareaChange = (e) => {
+    setTextareaValue(e.target.value);
+  };
+  const handleGenerateGraph = async ()  => {
+    console.log("Textarea content:", textareaValue);
+    try {
+      const response = await fetch('/api/text2graph', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: textareaValue }), // Sending the textarea value as JSON
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Backend graph:", data);
+        // Use fetchLLMGraphData to process the received data and update the graph
+        await graphManager.fetchLLMGraphData(data);
+
+      } else {
+        console.error("Failed to send data to the backend.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
   return (
     <div className="flex flex-col h-full space-y-5 w-full max-w-full justify-between">
@@ -30,6 +57,8 @@ export default function GraphLLMSubPanel() {
             base: "w-full",
             input: "resize-y min-h-[120px] max-h-[120px]",
           }}
+          value={textareaValue}
+          onChange={handleTextareaChange} // Capture input changes
         />
       </div>
       <GraphLLMButtonGroup

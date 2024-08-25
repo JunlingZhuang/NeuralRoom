@@ -12,6 +12,7 @@ from scripts.visualize_box_version import (
     prepare_dataset_and_model,
     generate_queried_unit_mesh,
 )
+from LLM.LLM_utils import make_LLM_request
 
 app = Flask(__name__)
 
@@ -22,7 +23,7 @@ dataset = None
 model = None
 args = None
 
-
+gt_dir = os.path.join(current_dir, "test/new_prior_1500_GT")
 args_location = os.path.join(current_dir, "test/new_prior_1500/args.json")
 ckpt_link = (
     "https://drive.google.com/file/d/1-YjqqoAnv9_FD288mRYIGoNW75CcJaUR/view?usp=sharing"
@@ -85,6 +86,30 @@ def generate_model():
             return jsonify({"error": "Model file not found"}), 404
     else:
         return jsonify({"error": "Model file path not found in script output"}), 404
+
+
+@app.route("/api/text2graph", methods=["POST"])
+def generate_graph():
+    data = request.json
+    text_value = data.get("text")
+    classes_dict = dataset.classes
+    rel_dict = dataset.relationships_dict
+    try:
+        room_list, adj_list = make_LLM_request(text_value, classes_dict, rel_dict)
+
+        # Process the text_value as needed
+        print(f"room_list {room_list}")
+        print(f"adj_list {adj_list}")
+    except Exception:
+        print(f"Error with OpenAI requests {Exception}")
+        return jsonify({"error": "OpenAI requests failed"}), 404
+
+    response = {
+        "nodes": room_list,  # a list of program type index
+        "edges": adj_list,  # a list of [source id,type,target id]
+    }
+
+    return jsonify(response)
 
 
 @app.route("/health", methods=["GET"])
