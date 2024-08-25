@@ -7,7 +7,7 @@ import RandomButton from "@/app/ui/explore/button/base-type/icon-only-button";
 import { CgDice5 } from "react-icons/cg";
 
 interface InputPanelButtonGroupProps {
-  isLoading: boolean;
+  isLoading?: boolean;
   isRandomButtonVisible: boolean;
   LeftContentButtonLabel: string;
   LeftContentButtonOnClick: () => void;
