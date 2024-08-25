@@ -4,7 +4,7 @@ import { useGenerationManager } from "@/app/lib/context/generationContext";
 import { Node, Edge, ProgramInfo } from "@/app/lib/manager/graphManager";
 import ProgramDropdown from "@/app/ui/explore/dropDown/programSelectionDropdown";
 
-// extend node type to add property to align the d3 features
+// extend node type to add property to align the d3 features 
 type NodeWithCoords = Node & {
   x?: number;
   y?: number;
