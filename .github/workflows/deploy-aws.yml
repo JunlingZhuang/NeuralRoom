@@ -18,13 +18,13 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           echo "OPENAI_API_KEY starts with: ${OPENAI_API_KEY:0:4}"
-      
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          
+
       - name: Build and push Next.js Docker image
         uses: docker/build-push-action@v5
         with:
@@ -50,6 +50,12 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
+
+      - name: Verify OPENAI_API_KEY during deploy
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "OPENAI_API_KEY during deploy starts with: ${OPENAI_API_KEY:0:4}"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
