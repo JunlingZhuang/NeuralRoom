@@ -9,6 +9,7 @@ import { CgDice5 } from "react-icons/cg";
 interface InputPanelButtonGroupProps {
   isLoading?: boolean;
   isRandomButtonVisible: boolean;
+  randomButtonOnClick: () => void;
   LeftContentButtonLabel: string;
   LeftContentButtonOnClick: () => void;
   LeftContentButtonIcon: React.ReactNode;
@@ -20,6 +21,7 @@ interface InputPanelButtonGroupProps {
 export default function InputPanelButtonGroup({
   isLoading,
   isRandomButtonVisible,
+  randomButtonOnClick,
   LeftContentButtonLabel,
   LeftContentButtonOnClick,
   LeftContentButtonIcon,
@@ -27,10 +29,6 @@ export default function InputPanelButtonGroup({
   RightContentButtonOnClick,
   RightContentButtonIcon,
 }: InputPanelButtonGroupProps) {
-  const handleRandomInput = () => {
-    console.log("Click on Random input");
-  };
-
   return (
     <div className="flex flex-row gap-1 justify-between">
       <div className="random-button">
@@ -41,8 +39,8 @@ export default function InputPanelButtonGroup({
             variant="solid"
             radiusSize="full"
             size="sm"
-            onClick={handleRandomInput}
-            ariaLabel="Random Input"
+            onClick={randomButtonOnClick}
+            ariaLabel="Click to input a random prompt"
           />
         ) : (
           <div className="w-12"></div> //placeholder for case of invisible

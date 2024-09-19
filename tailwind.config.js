@@ -39,6 +39,10 @@ module.exports = {
       themes: {
         dark: {
           colors: {
+            default: {
+              DEFAULT: "#686868",
+              foreground: "#FFFFFF",
+            },
             primary: {
               DEFAULT: "#46A8E5",
               foreground: "#000000",
@@ -46,6 +50,10 @@ module.exports = {
             secondary: {
               DEFAULT: "#686868",
               foreground: "#FFFFFF",
+            },
+            warning: {
+              DEFAULT: "#202020",
+              foreground: "#686868",
             },
             focus: "#BEF264",
           },

@@ -12,6 +12,11 @@ export default function UserProfileSubPanel() {
   const handleRestart = () => {
     console.log("Click On Restart");
   };
+
+  const handleRandomBtnClick = () => {
+    console.log("Click on Random");
+  };
+
   return (
     <div className="flex flex-col h-full space-y-5 w-full max-w-full justify-between">
       <div className="UserProfileContaniner flex-col space-y-5">
@@ -22,6 +27,7 @@ export default function UserProfileSubPanel() {
       <UserProfileButtonGroup //userprofile
         isLoading={false}
         isRandomButtonVisible={false}
+        randomButtonOnClick={handleRandomBtnClick}
         LeftContentButtonLabel="Restart"
         LeftContentButtonOnClick={handleRestart}
         LeftContentButtonIcon={<RiRestartLine />}
