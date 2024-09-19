@@ -1,27 +1,18 @@
 import { UserProfilePersonaOptionProps } from "@/app/lib/definition/user_profile_definition";
 
-//store fetech data function
-
-//1.fetch node data
-
-//2.fetch edge data
-
-//3.send the data to backend and get
-
-//
-
-// export const fetchUserProfilePersonaOptions = async () => {
-//   const response = await fetch("initial_data/user-persona-options.json");
-//   if (!response.ok) {
-//     throw new Error("Network response for UserProfilePersona list was not ok");
-//   }
-//   return await response.json();
-// };
+export async function fetchSamplePrompts() {
+  const response = await fetch("initial_data/samplePrompts.json");
+  if (!response.ok) {
+    throw new Error("Network fetchSamplePrompts response was not ok");
+  }
+  const samplePrompts = await response.json();
+  return samplePrompts;
+}
 
 export async function getColorAndProgramNameDict() {
   const response = await fetch("dict/program_dict.json");
   if (!response.ok) {
-    throw new Error("Network response was not ok");
+    throw new Error("Network getColorAndProgramNameDict response was not ok");
   }
   const programColorAndNameDict = await response.json();
   return programColorAndNameDict;
@@ -30,7 +21,7 @@ export async function getColorAndProgramNameDict() {
 export async function fetchSampleNodehData() {
   const nodeResponse = await fetch("initial_data/node.json");
   if (!nodeResponse.ok) {
-    throw new Error("Network response was not ok");
+    throw new Error("Network fetchSampleNodehData response was not ok");
   }
   return await nodeResponse.json();
 }
@@ -38,7 +29,7 @@ export async function fetchSampleNodehData() {
 export async function fetchSampleEdgeData() {
   const edgeResponse = await fetch("initial_data/edge.json");
   if (!edgeResponse.ok) {
-    throw new Error("Network response was not ok");
+    throw new Error("Network fetchSampleEdgeData response was not ok");
   }
   return await edgeResponse.json();
 }

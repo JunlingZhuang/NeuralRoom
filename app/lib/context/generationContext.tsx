@@ -9,10 +9,23 @@ import {
   GraphManager,
   createGraphManager,
 } from "@/app/lib/manager/graphManager";
+import { fetchSamplePrompts } from "@/app/lib/data";
 
 type GenerationManager = {
   modelManager: ModelManager;
   graphManager: GraphManager;
+  getSamplePrompts: () => Promise<string[]>;
+};
+
+const getSamplePrompts = async () => {
+  try {
+    const prompts = await fetchSamplePrompts();
+    const promptList = prompts.map((prompt: { prompt: string }) => prompt.prompt);
+    return promptList;
+  } catch (error) {
+    console.error("Error fetching sample prompts:", error);
+    return [];
+  }
 };
 
 const GenerationManagerContext = createContext<GenerationManager | undefined>(
@@ -38,7 +51,7 @@ export const GenerationManagerProvider = ({
 
   const graphManager = createGraphManager();
 
-  const generationManager = { modelManager, graphManager };
+  const generationManager = { modelManager, graphManager, getSamplePrompts };
 
   return (
     <GenerationManagerContext.Provider value={generationManager}>

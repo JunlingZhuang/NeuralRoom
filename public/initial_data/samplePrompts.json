@@ -1,0 +1,14 @@
+[
+  {
+    "prompt": " A layout designed for a family of 3, where the parents share a bedroom, and the father works from home."
+  },
+  {
+    "prompt": "A layout designed for a single professional who works from home and enjoys painting. They need a dedicated workspace and an art studio."
+  },
+  {
+    "prompt": "A layout designed for a multi-generational family of 6, including grandparents, parents, and two children. The grandparents have their own bedroom, the parents share a bedroom, and the children share a bedroom. The grandparents need easy access to a bathroom."
+  },
+  {
+    "prompt": "A layout designed for a family of 4, with frequent guests. The parents share a bedroom, the children each have their own bedroom, and they need an additional guest room."
+  }
+]

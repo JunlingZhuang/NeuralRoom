@@ -320,7 +320,7 @@ export default function GraphCanvas() {
   return (
     <div
       ref={canvasRef}
-      className="GraphCanvas shadow-2xl rounded-[16px] backdrop-blur-xl w-full h-96 bg-panel-bg bg-opacity-60 justify-center relative"
+      className="GraphCanvas shadow-2xl rounded-[16px] backdrop-blur-xl w-full h-80 bg-panel-bg bg-opacity-60 justify-center relative"
     >
       <ProgramDropdown
         programList={programList}

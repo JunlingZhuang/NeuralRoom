@@ -10,8 +10,10 @@ import { Graph } from "@/app/lib/manager/graphManager";
 
 export default function GraphLLMSubPanel() {
   const [primaryPrompt, setPrimaryPrompt] = useState("");
-  const { graphManager } = useGenerationManager();
+  const { graphManager, getSamplePrompts } = useGenerationManager();
   const [isLoading, setIsLoading] = useState(false);
+  const [isInvalid, setIsInvalid] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleRestart = () => {
     console.log("Click on Restart");
@@ -21,23 +23,44 @@ export default function GraphLLMSubPanel() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setPrimaryPrompt(e.target.value);
+    setIsInvalid(false); // Reset isInvalid when user starts typing
   };
 
   const handleGenerateGraph = async () => {
+    if (!primaryPrompt) {
+      setErrorMessage("The description input is empty.");
+      setIsInvalid(true);
+      return;
+    }
     setIsLoading(true);
     console.log("Textarea content:", primaryPrompt);
+
     try {
       const rawGraphData = await generateGraph_Backend(primaryPrompt);
       const newGraph: Graph = await graphManager.handleGeneratedGraphData(
         rawGraphData
       );
 
-      graphManager.updateGraph(newGraph);
+      if (newGraph.Nodes.length !== 0 && newGraph.Edges.length !== 0) {
+        graphManager.updateGraph(newGraph);
+      } else {
+        setIsInvalid(true);
+        setErrorMessage("Please input a valid prompt.");
+      }
     } catch (error) {
       console.error("Error:", error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleRandomBtnClick = async () => {
+    setIsInvalid(false); // Reset isInvalid when user starts typing
+    console.log("Click on Random input");
+    const samplePrompts = await getSamplePrompts();
+    setPrimaryPrompt(
+      samplePrompts[Math.floor(Math.random() * samplePrompts.length)]
+    );
   };
 
   return (
@@ -46,14 +69,14 @@ export default function GraphLLMSubPanel() {
         <div className="flex text-lg justify-center">Graph</div>
         <GraphCanvas />
         <Textarea
-          isInvalid={false}
+          isInvalid={isInvalid}
           key="bordered"
           size="lg"
           variant="bordered"
           label="Primary Prompt"
           labelPlacement="inside"
           placeholder="Describe some social relationships that would matter in the design"
-          errorMessage="The description should be at least 255 characters long."
+          errorMessage={errorMessage}
           classNames={{
             base: "w-full",
             input: "resize-y min-h-[120px] max-h-[120px]",
@@ -65,6 +88,7 @@ export default function GraphLLMSubPanel() {
       <GraphLLMButtonGroup
         isLoading={isLoading}
         isRandomButtonVisible={true}
+        randomButtonOnClick={handleRandomBtnClick}
         LeftContentButtonLabel="Restart"
         LeftContentButtonOnClick={handleRestart}
         LeftContentButtonIcon={<RiRestartLine />}

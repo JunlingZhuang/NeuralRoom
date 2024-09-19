@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@nextui-org/react";
+import { Tooltip, Button } from "@nextui-org/react";
 
 interface CustomIconButtonProps {
   icon?: React.ReactNode;
@@ -28,7 +28,12 @@ export default function CustomIconButton({
   ariaLabel,
 }: CustomIconButtonProps) {
   return (
-    <div className="flex gap-4 items-center">
+    <Tooltip
+      showArrow={true}
+      placement="right"
+      color="warning"
+      content={ariaLabel}
+    >
       <Button
         isIconOnly
         color={color}
@@ -40,6 +45,6 @@ export default function CustomIconButton({
       >
         {icon}
       </Button>
-    </div>
+    </Tooltip>
   );
 }
