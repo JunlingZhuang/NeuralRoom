@@ -1,12 +1,23 @@
 import React from "react";
 import { Textarea } from "@nextui-org/react";
 
-export default function TextInputWrapper() {
+interface TextInputWrapperProps {
+  userProfile: {
+    familyOccupations: string | null;
+    socialRelationships: string | null;
+  };
+  onProfileChange: (field: string, value: string) => void;
+}
+
+export default function TextInputWrapper({
+  userProfile,
+  onProfileChange,
+}: TextInputWrapperProps) {
   return (
     <div className="w-full grid grid-cols-2 lg:grid-cols-1 gap-4">
       <Textarea
         isInvalid={false}
-        key="bordered"
+        key="important-info"
         variant="bordered"
         label="Important Information"
         labelPlacement="inside"
@@ -16,11 +27,13 @@ export default function TextInputWrapper() {
           base: "w-full",
           input: "resize-y min-h-[100px]",
         }}
+        value={userProfile.familyOccupations ?? ""}
+        onChange={(e) => onProfileChange("familyOccupations", e.target.value)}
       />
 
       <Textarea
         isInvalid={false}
-        key="bordered"
+        key="social-relationships"
         variant="bordered"
         label="Social Relationships"
         labelPlacement="inside"
@@ -30,6 +43,8 @@ export default function TextInputWrapper() {
           base: "w-full",
           input: "resize-y min-h-[100px]",
         }}
+        value={userProfile.socialRelationships ?? ""}
+        onChange={(e) => onProfileChange("socialRelationships", e.target.value)}
       />
     </div>
   );

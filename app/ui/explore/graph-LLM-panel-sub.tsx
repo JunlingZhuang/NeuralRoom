@@ -16,6 +16,7 @@ export default function GraphLLMSubPanel() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleRestart = () => {
+    setPrimaryPrompt("");
     console.log("Click on Restart");
   };
 

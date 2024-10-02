@@ -3,7 +3,20 @@ import { Select, SelectItem, Input } from "@nextui-org/react";
 import { fetchUserProfilePersonaOptions } from "@/app/lib/data";
 import { UserProfilePersonaOptionProps } from "@/app/lib/definition/user_profile_definition";
 
-export default function SelectInputWrapper() {
+interface SelectInputWrapperProps {
+  userProfile: {
+    persona: string;
+    bedroomNumber: string;
+    bathroomNumber: string;
+    livingRoomNumber: string;
+  };
+  onProfileChange: (field: string, value: string | number) => void;
+}
+
+export default function SelectInputWrapper({
+  userProfile,
+  onProfileChange,
+}: SelectInputWrapperProps) {
   const [userPersonaOptions, setUserPersonaOptions] = useState<
     UserProfilePersonaOptionProps[]
   >([]);
@@ -43,6 +56,8 @@ export default function SelectInputWrapper() {
 
               innerWrapper: ["dark:bg-transparent"],
             }}
+            selectedKeys={[userProfile.persona]}
+            onChange={(e) => onProfileChange("persona", e.target.value)}
           >
             {userPersonaOptions.map((userPersonaOption) => (
               <SelectItem className="text-white" key={userPersonaOption.key}>
@@ -51,7 +66,7 @@ export default function SelectInputWrapper() {
             ))}
           </Select>
         </div>
-        <div>
+        <div className="BedroomNumberInput">
           <Input
             type="number"
             label="Bedroom"
@@ -74,9 +89,13 @@ export default function SelectInputWrapper() {
                 "!cursor-text",
               ],
             }}
+            value={userProfile.bedroomNumber}
+            onChange={(e) =>
+              onProfileChange("bedroomNumber", e.target.value)
+            }
           />
         </div>
-        <div>
+        <div className="BathroomNumberInput">
           <Input
             type="number"
             label="Bathroom"
@@ -100,9 +119,13 @@ export default function SelectInputWrapper() {
                 "!cursor-text",
               ],
             }}
+            value={userProfile.bathroomNumber}
+            onChange={(e) =>
+              onProfileChange("bathroomNumber", e.target.value)
+            }
           />
         </div>
-        <div>
+        <div className="LivingRoomNumberInput">
           <Input
             type="number"
             label="Living Room"
@@ -125,6 +148,10 @@ export default function SelectInputWrapper() {
                 "!cursor-text",
               ],
             }}
+            value={userProfile.livingRoomNumber}
+            onChange={(e) =>
+              onProfileChange("livingRoomNumber", e.target.value)
+            }
           />
         </div>
       </div>
