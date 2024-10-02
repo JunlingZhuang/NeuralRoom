@@ -10,11 +10,19 @@ import {
   createGraphManager,
 } from "@/app/lib/manager/graphManager";
 import { fetchSamplePrompts } from "@/app/lib/data";
+import { SaveManager, createSaveManager, SavedState } from "@/app/lib/manager/saveManager";
+import { UserProfileManager, createUserProfileManager } from "@/app/lib/manager/userProfileManager";
+import { UserProfile } from "@/app/lib/definition/user_profile_definition";
 
 type GenerationManager = {
   modelManager: ModelManager;
   graphManager: GraphManager;
+  userProfileManager: UserProfileManager; // 新增
   getSamplePrompts: () => Promise<string[]>;
+  saveManager: SaveManager;
+  saveCurrentState: () => Promise<void>;
+  loadSavedState: (index?: number) => Promise<void>;
+  getAllSavedStates: () => Promise<SavedState[]>;
 };
 
 const getSamplePrompts = async () => {
@@ -51,7 +59,56 @@ export const GenerationManagerProvider = ({
 
   const graphManager = createGraphManager();
 
-  const generationManager = { modelManager, graphManager, getSamplePrompts };
+  const saveManager = createSaveManager();
+
+  const userProfileManager = createUserProfileManager();
+
+  const saveCurrentState = async () => {
+    const currentState: SavedState = {
+      graph: graphManager.graph,
+      model: modelManager.model,
+      boundingBoxSize: modelManager.boundingBoxSize,
+      floorNum: modelManager.floorNum,
+      bottomCenterPoint: modelManager.bottomCenterPoint,
+      userProfile: userProfileManager.currentProfile,
+      timestamp: Date.now(),
+    };
+    await saveManager.saveState(currentState);
+  };
+
+  const loadSavedState = async (index?: number) => {
+    const savedState = await saveManager.loadState(index);
+    if (savedState) {
+      graphManager.updateGraph(savedState.graph);
+      modelManager.updateModel(savedState.model);
+      modelManager.updateBoundingBoxSize(savedState.boundingBoxSize);
+      modelManager.updateFloorNum(savedState.floorNum);
+      modelManager.updateBottomCenterPoint(savedState.bottomCenterPoint);
+      if (savedState.userProfile) {
+        userProfileManager.setCurrentProfile(savedState.userProfile);
+      }
+      setStateUpdated(true); // 通知状态已更新
+    }
+  };
+
+  const getAllSavedStates = async () => {
+    return await saveManager.getAllStates();
+  };
+
+  const [stateUpdated, setStateUpdated] = useState(false);
+
+  const generationManager = {
+    modelManager,
+    graphManager,
+    userProfileManager,
+    getSamplePrompts,
+    saveManager,
+    saveCurrentState,
+    loadSavedState,
+    getAllSavedStates,
+    stateUpdated,
+    setStateUpdated,
+  };
 
   return (
     <GenerationManagerContext.Provider value={generationManager}>

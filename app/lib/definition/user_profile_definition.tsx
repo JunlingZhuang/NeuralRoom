@@ -3,9 +3,9 @@ export type UserProfile = {
   bedroomNum: number;
   bathroomNum: number;
   livingRoomNum: number;
-  description1: string;
-  description2: string;
-  description3: string;
+  primaryPrompt: string;
+  famliyInfoPrompt: string;
+  socialInfoPrompt: string;
   printProfile: () => void;
 };
 
@@ -14,27 +14,24 @@ export const createUserProfile = (
   bedroomNum: number,
   bathroomNum: number,
   livingRoomNum: number,
-  description1: string,
-  description2: string,
-  description3: string
+  primaryPrompt: string,
+  famliyInfoPrompt: string,
+  socialInfoPrompt: string
 ): UserProfile => {
   return {
     userPersona,
     bedroomNum,
     bathroomNum,
     livingRoomNum,
-    description1,
-    description2,
-    description3,
+    primaryPrompt,
+    famliyInfoPrompt,
+    socialInfoPrompt,
     printProfile: function () {
       console.log("User Profile:");
       console.log(`Persona: ${this.userPersona}`);
       console.log(`Bedrooms: ${this.bedroomNum}`);
       console.log(`Bathrooms: ${this.bathroomNum}`);
       console.log(`Living Rooms: ${this.livingRoomNum}`);
-      console.log(`Description 1: ${this.description1}`);
-      console.log(`Description 2: ${this.description2}`);
-      console.log(`Description 3: ${this.description3}`);
     },
   };
 };
@@ -53,9 +50,6 @@ export const updateUserProfile = (
       console.log(`Bedrooms: ${this.bedroomNum}`);
       console.log(`Bathrooms: ${this.bathroomNum}`);
       console.log(`Living Rooms: ${this.livingRoomNum}`);
-      console.log(`Description 1: ${this.description1}`);
-      console.log(`Description 2: ${this.description2}`);
-      console.log(`Description 3: ${this.description3}`);
     },
   };
 };
@@ -68,5 +62,4 @@ export type UserProfileDefinitionProps = {
 export type UserProfilePersonaOptionProps = {
   key: string;
   label: string;
-}
-
+};
