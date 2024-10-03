@@ -6,42 +6,56 @@ import {
 } from "@/app/lib/definition/user_profile_definition";
 
 export type UserProfileManager = {
-  currentProfile: UserProfile | null;
-  updateProfile: (updates: Partial<UserProfile>) => void;
+  currentProfile: UserProfile;
+  createDefaultProfile: () => void;
+  updateWholeCurrentProfile: (updates: Partial<UserProfile>) => void;
   setCurrentProfile: (profile: UserProfile) => void;
   resetProfile: () => void;
-  updateField: <K extends keyof UserProfile>(field: K, value: UserProfile[K]) => void;
+  updateCurrentUserProfileField: <K extends keyof UserProfile>(
+    field: K,
+    value: UserProfile[K]
+  ) => void;
 };
 
 export const createUserProfileManager = (): UserProfileManager => {
-  const [currentProfile, setCurrentProfile] = useState<UserProfile | null>(null);
+  const defaultProfile = createUserProfile("", null, null, null, "", "", "");
 
-  const updateProfile = (updates: Partial<UserProfile>) => {
-    if (currentProfile) {
-      const updatedProfile = updateUserProfile(currentProfile, updates);
-      setCurrentProfile(updatedProfile);
-    }
+  const [currentProfile, setCurrentProfile] =
+    useState<UserProfile>(defaultProfile);
+
+  const createDefaultProfile = () => {
+    const defaultProfile = createUserProfile("", null, null, null, "", "", "");
+    console.log("Create Default Profile", defaultProfile);
+    setCurrentProfile(defaultProfile);
+  };
+
+  const updateWholeCurrentProfile = (updates: Partial<UserProfile>) => {
+    const updatedProfile = updateUserProfile(currentProfile, updates);
+    setCurrentProfile(updatedProfile);
   };
 
   const resetProfile = () => {
-    setCurrentProfile(null);
+    setCurrentProfile(defaultProfile);
   };
 
-  const updateField = <K extends keyof UserProfile>(field: K, value: UserProfile[K]) => {
-    if (currentProfile) {
-      const updatedProfile = {
-        ...currentProfile,
-        [field]: value,
-      };
-      setCurrentProfile(updatedProfile);
-    }
+  const updateCurrentUserProfileField = <K extends keyof UserProfile>(
+    field: K,
+    value: UserProfile[K]
+  ) => {
+    const updatedProfile = {
+      ...currentProfile,
+      [field]: value,
+    };
+    console.log(`Update Current User Profile Field: ${field}: ${value}`);
+    setCurrentProfile(updatedProfile);
   };
 
   return {
     currentProfile,
-    updateProfile,
+    createDefaultProfile,
+    updateWholeCurrentProfile,
     setCurrentProfile,
     resetProfile,
-    updateField,
+    updateCurrentUserProfileField,
   };
 };

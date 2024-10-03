@@ -1,12 +1,9 @@
 import React from "react";
 import { Textarea } from "@nextui-org/react";
-
+import { UserProfile } from "@/app/lib/definition/user_profile_definition";
 interface TextInputWrapperProps {
-  userProfile: {
-    familyOccupations: string | null;
-    socialRelationships: string | null;
-  };
-  onProfileChange: (field: string, value: string) => void;
+  userProfile: UserProfile;
+  onProfileChange: (field: keyof UserProfile, value: string) => void;
 }
 
 export default function TextInputWrapper({
@@ -27,8 +24,8 @@ export default function TextInputWrapper({
           base: "w-full",
           input: "resize-y min-h-[100px]",
         }}
-        value={userProfile.familyOccupations ?? ""}
-        onChange={(e) => onProfileChange("familyOccupations", e.target.value)}
+        value={userProfile.famliyInfoPrompt ?? ""}
+        onChange={(e) => onProfileChange("famliyInfoPrompt", e.target.value)}
       />
 
       <Textarea
@@ -43,8 +40,8 @@ export default function TextInputWrapper({
           base: "w-full",
           input: "resize-y min-h-[100px]",
         }}
-        value={userProfile.socialRelationships ?? ""}
-        onChange={(e) => onProfileChange("socialRelationships", e.target.value)}
+        value={userProfile.socialInfoPrompt ?? ""}
+        onChange={(e) => onProfileChange("socialInfoPrompt", e.target.value)}
       />
     </div>
   );

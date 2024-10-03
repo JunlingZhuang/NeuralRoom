@@ -5,7 +5,7 @@ import SwitchTabMain from "@/app/ui/explore/switch-tab-main";
 import GraphLLMContentPanel from "@/app/ui/explore/graph-content-panel";
 import HistoryContentPanel from "@/app/ui/explore/history-content-panel";
 import SizeInputButtonGroup from "@/app/ui/explore/buttonGroup/size-input-button-group";
-
+import HistoryCollectionButtonGroup from "@/app/ui/explore/buttonGroup/history-collection-button-group";
 export default function InputPanel() {
   const [activePanel, setActivePanel] = useState("graph");
 
@@ -32,6 +32,9 @@ export default function InputPanel() {
         </div>
         <div className="absolute bottom-12 left-1/2 transform -translate-x-2/5 w-2/5 pointer-events-auto hidden lg:block">
           <SizeInputButtonGroup />
+        </div>
+        <div className="absolute top-1/4 inset-y-0 right-0 z-20 pointer-events-auto">
+          <HistoryCollectionButtonGroup />
         </div>
       </div>
     </div>
