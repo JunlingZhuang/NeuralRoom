@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import SwitchSubTab from "./switch-tab-sub";
 import UserProfileSubPanel from "@/app/ui/explore/user-profile-panel-sub";
 import GraphLLMSubPanel from "@/app/ui/explore/graph-LLM-panel-sub";
-
 export default function GraphLLMContentPanel() {
   const [activeSubPanel, setActiveSubPanel] = useState("graphLLM");
 

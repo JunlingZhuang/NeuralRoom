@@ -2,15 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Select, SelectItem, Input } from "@nextui-org/react";
 import { fetchUserProfilePersonaOptions } from "@/app/lib/data";
 import { UserProfilePersonaOptionProps } from "@/app/lib/definition/user_profile_definition";
-
+import { UserProfile } from "@/app/lib/definition/user_profile_definition";
 interface SelectInputWrapperProps {
-  userProfile: {
-    persona: string;
-    bedroomNumber: string;
-    bathroomNumber: string;
-    livingRoomNumber: string;
-  };
-  onProfileChange: (field: string, value: string | number) => void;
+  userProfile: UserProfile;
+  onProfileChange: (field: keyof UserProfile, value: string | number) => void;
 }
 
 export default function SelectInputWrapper({
@@ -56,8 +51,8 @@ export default function SelectInputWrapper({
 
               innerWrapper: ["dark:bg-transparent"],
             }}
-            selectedKeys={[userProfile.persona]}
-            onChange={(e) => onProfileChange("persona", e.target.value)}
+            selectedKeys={[userProfile.userPersona]}
+            onChange={(e) => onProfileChange("userPersona", e.target.value)}
           >
             {userPersonaOptions.map((userPersonaOption) => (
               <SelectItem className="text-white" key={userPersonaOption.key}>
@@ -89,9 +84,9 @@ export default function SelectInputWrapper({
                 "!cursor-text",
               ],
             }}
-            value={userProfile.bedroomNumber}
+            value={userProfile.bedroomNum?.toString() ?? ''}
             onChange={(e) =>
-              onProfileChange("bedroomNumber", e.target.value)
+              onProfileChange("bedroomNum", parseInt(e.target.value, 10))
             }
           />
         </div>
@@ -119,9 +114,9 @@ export default function SelectInputWrapper({
                 "!cursor-text",
               ],
             }}
-            value={userProfile.bathroomNumber}
+            value={userProfile.bathroomNum?.toString() ?? ''}
             onChange={(e) =>
-              onProfileChange("bathroomNumber", e.target.value)
+              onProfileChange("bathroomNum", parseInt(e.target.value, 10))
             }
           />
         </div>
@@ -148,9 +143,9 @@ export default function SelectInputWrapper({
                 "!cursor-text",
               ],
             }}
-            value={userProfile.livingRoomNumber}
+            value={userProfile.livingRoomNum?.toString() ?? ''}
             onChange={(e) =>
-              onProfileChange("livingRoomNumber", e.target.value)
+              onProfileChange("livingRoomNum", parseInt(e.target.value, 10))
             }
           />
         </div>

@@ -11,7 +11,7 @@ export type SavedState = {
   floorNum: number;
   bottomCenterPoint: BottomCenterPoint;
   userProfile: UserProfile | null;
-  timestamp: number; 
+  timestamp: number;
 };
 
 export type SaveManager = {

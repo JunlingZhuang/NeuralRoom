@@ -1,19 +1,18 @@
 export type UserProfile = {
   userPersona: string;
-  bedroomNum: number;
-  bathroomNum: number;
-  livingRoomNum: number;
+  bedroomNum: number | null;
+  bathroomNum: number | null;
+  livingRoomNum: number | null;
   primaryPrompt: string;
   famliyInfoPrompt: string;
   socialInfoPrompt: string;
-  printProfile: () => void;
 };
 
 export const createUserProfile = (
   userPersona: string,
-  bedroomNum: number,
-  bathroomNum: number,
-  livingRoomNum: number,
+  bedroomNum: number | null,
+  bathroomNum: number | null,
+  livingRoomNum: number | null,
   primaryPrompt: string,
   famliyInfoPrompt: string,
   socialInfoPrompt: string
@@ -26,13 +25,6 @@ export const createUserProfile = (
     primaryPrompt,
     famliyInfoPrompt,
     socialInfoPrompt,
-    printProfile: function () {
-      console.log("User Profile:");
-      console.log(`Persona: ${this.userPersona}`);
-      console.log(`Bedrooms: ${this.bedroomNum}`);
-      console.log(`Bathrooms: ${this.bathroomNum}`);
-      console.log(`Living Rooms: ${this.livingRoomNum}`);
-    },
   };
 };
 
@@ -44,13 +36,6 @@ export const updateUserProfile = (
   return {
     ...userProfile,
     ...updates,
-    printProfile: function () {
-      console.log("User Profi+   le:");
-      console.log(`Persona: ${this.userPersona}`);
-      console.log(`Bedrooms: ${this.bedroomNum}`);
-      console.log(`Bathrooms: ${this.bathroomNum}`);
-      console.log(`Living Rooms: ${this.livingRoomNum}`);
-    },
   };
 };
 
