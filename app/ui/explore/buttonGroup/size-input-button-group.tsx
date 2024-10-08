@@ -36,22 +36,22 @@ export default function SizeInputButtonGroup() {
   };
 
   return (
-    <div className="flex flex-row gap-1 bg-transparent ">
-      <div className="shadow-2xl backdrop-blur-xl rounded-tl-full flex items-center rounded-bl-full basis-1/4 grow h-12  bg-panel-bg bg-opacity-60 p-2">
+    <div className="flex flex-row gap-1.5 bg-transparent ">
+      <div className="shadow-2xl backdrop-blur-xl rounded-tl-full flex items-center rounded-bl-full basis-1/4 grow h-12  bg-panel-bg bg-opacity-60 p-2 transition-all ease-in-out duration-300 hover:scale-105 hover:-translate-y-1 hover:-translate-x-1">
         <SizeSlider
           initialValue={currentBoxSize.length}
           label="length"
           maxValue={100}
         />
       </div>
-      <div className="shadow-2xl backdrop-blur-xl flex items-center basis-1/4 grow h-12 bg-panel-bg bg-opacity-60 p-2">
+      <div className="shadow-2xl backdrop-blur-xl flex items-center basis-1/4 grow h-12 bg-panel-bg bg-opacity-60 p-2 transition-all ease-in-out duration-300 hover:scale-105 hover:-translate-y-1 ">
         <SizeSlider
           initialValue={currentBoxSize.width}
           label="width"
           maxValue={100}
         />
       </div>
-      <div className="shadow-2xl backdrop-blur-xl flex items-center basis-1/4 grow h-12 bg-panel-bg bg-opacity-60 p-2">
+      <div className="shadow-2xl backdrop-blur-xl flex items-center basis-1/4 grow h-12 bg-panel-bg bg-opacity-60 p-2 transition-all ease-in-out duration-300 hover:scale-105 hover: hover:-translate-y-1 ">
         <SizeSlider
           initialValue={currentBoxSize.height}
           label="height"

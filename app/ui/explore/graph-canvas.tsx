@@ -4,7 +4,7 @@ import { useGenerationManager } from "@/app/lib/context/generationContext";
 import { Node, Edge, ProgramInfo } from "@/app/lib/manager/graphManager";
 import ProgramDropdown from "@/app/ui/explore/dropDown/programSelectionDropdown";
 
-// extend node type to add property to align the d3 features 
+// extend node type to add property to align the d3 features
 type NodeWithCoords = Node & {
   x?: number;
   y?: number;
@@ -320,7 +320,7 @@ export default function GraphCanvas() {
   return (
     <div
       ref={canvasRef}
-      className="GraphCanvas shadow-2xl rounded-[16px] backdrop-blur-xl w-full h-80 bg-panel-bg bg-opacity-60 justify-center relative"
+      className="GraphCanvas shadow-2xl rounded-[16px] backdrop-blur-xl w-full h-80 bg-panel-bg bg-opacity-60 justify-center relative transition-all ease-in-out duration-300 hover:scale-[1.02] "
     >
       <ProgramDropdown
         programList={programList}

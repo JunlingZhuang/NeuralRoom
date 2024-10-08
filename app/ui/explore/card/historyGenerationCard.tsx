@@ -9,7 +9,7 @@ export default function HistoryGenerationCard({
   savedState: SavedState;
 }) {
   return (
-    <div className="w-full h-48 p-4 shadow-2xl rounded-[16px] backdrop-blur-xl bg-panel-bg bg-opacity-60 justify-center transition-all ease-in-out duration-500 hover:h-[40vh] hover:min-h-[12rem] group hover:scale-105 hover:overflow-hidden">
+    <div className="w-full h-48 p-4 shadow-2xl rounded-[16px] backdrop-blur-xl bg-panel-bg bg-opacity-60 justify-center transition-all ease-in-out duration-500 hover:h-[40vh] hover:min-h-[12rem] group hover:scale-[1.03] hover:overflow-hidden">
       <div className="w-full h-full flex flex-row gap-3 transition-all duration-500 ease-in-out">
         <div className="w-1/3 h-full relative rounded-lg overflow-hidden transition-all duration-500 ease-in-out group-hover:h-auto group-hover:min-h-[10rem]">
           <Image
