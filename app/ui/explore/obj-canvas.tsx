@@ -1,10 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, Environment } from "@react-three/drei";
 import { useGenerationManager } from "@/app/lib/context/generationContext";
 import { Group, Mesh, MeshStandardMaterial, DoubleSide } from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
+import { Plane } from "@react-three/drei";
 
 export default function ThreeCanvas() {
   const { modelManager } = useGenerationManager();
@@ -13,8 +14,8 @@ export default function ThreeCanvas() {
   const generatedNewModel = modelManager.model;
 
   const sharedMaterial = new MeshStandardMaterial({
-    metalness: 0.1,
-    roughness: 0.5,
+    metalness: 0.4,
+    roughness: 0.7,
     side: DoubleSide,
     color: "#cc7b32",
   });
@@ -54,21 +55,45 @@ export default function ThreeCanvas() {
 
   return (
     <Canvas
-      camera={{ fov: 30, position: [0, 0, 20] }}
+      camera={{ fov: 45, position: [0, 0, 20] }}
       shadows
       style={{ background: "black" }}
     >
-      <ambientLight intensity={Math.PI / 2} />
-      <pointLight position={[10, 10, 10]} />
-      <directionalLight color="#cc7b32" position={[5, 5, 5]} />
+      <color attach="background" args={["#000000"]} />
+      <fog attach="fog" args={["#000000", 20, 100]} />
+      <ambientLight intensity={0.4} /> // Increased from 0.3
+      <pointLight position={[10, 10, 10]} intensity={0.8} /> // Increased from
+      0.7
+      <directionalLight
+        color="#ffffff"
+        position={[5, 5, 5]}
+        intensity={1} // Increased from 0.9
+        castShadow
+      />
+      <spotLight
+        position={[-5, 5, 5]}
+        angle={0.15}
+        penumbra={1}
+        intensity={0.5}
+        castShadow
+      />
       {currentObjModel ? (
-        <primitive object={currentObjModel} />
+        <primitive object={currentObjModel} castShadow receiveShadow />
       ) : (
-        <mesh position={[0, 0, 0]}>
+        <mesh position={[0, 0, 0]} castShadow receiveShadow>
           <boxGeometry args={[boxSize.length, boxSize.height, boxSize.width]} />
           <meshStandardMaterial {...sharedMaterial} />
         </mesh>
       )}
+      <Plane
+        receiveShadow
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, -boxSize.height / 2, 0]}
+        args={[100, 100]}
+      >
+        <shadowMaterial opacity={0.2} />
+      </Plane>
+      <Environment preset="apartment" />
       <OrbitControls />
     </Canvas>
   );
