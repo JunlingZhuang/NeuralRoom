@@ -35,7 +35,7 @@ export default function CustomActiveButton({
   borderWidth,
 }: CustomTabButtonProps) {
   return (
-    <Button
+    <Button 
       isIconOnly
       className={classNames(
         isActive ? "bg-main-blue ring-4 ring-main-blue border-black" : "",

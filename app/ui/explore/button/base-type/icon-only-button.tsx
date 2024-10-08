@@ -42,6 +42,7 @@ export default function CustomIconButton({
         aria-label={ariaLabel}
         size={size}
         onClick={onClick}
+        className="transition-all ease-in-out hover:scale-125 duration-300"
       >
         {icon}
       </Button>

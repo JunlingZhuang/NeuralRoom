@@ -50,7 +50,7 @@ export default function Generate3DButton({
       size={size}
       onClick={onClick}
       ariaLabel="Generate 3D Model"
-      className="flex items-center justify-center space-x-2"
+      className="flex items-center justify-center space-x-2 transition-all ease-in-out duration-300 hover:scale-105"
       startContent={startContent}
       endContent={endContent}
     >
