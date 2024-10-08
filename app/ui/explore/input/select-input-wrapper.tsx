@@ -15,14 +15,18 @@ export default function SelectInputWrapper({
   const [userPersonaOptions, setUserPersonaOptions] = useState<
     UserProfilePersonaOptionProps[]
   >([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadUserPersonaOptions = async () => {
+      setIsLoading(true);
       try {
         const data = await fetchUserProfilePersonaOptions();
         setUserPersonaOptions(data);
       } catch (error) {
         console.error("Failed to fetch user types:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -51,8 +55,9 @@ export default function SelectInputWrapper({
 
               innerWrapper: ["dark:bg-transparent"],
             }}
-            selectedKeys={[userProfile.userPersona]}
+            selectedKeys={userProfile.userPersona && !isLoading ? [userProfile.userPersona] : []}
             onChange={(e) => onProfileChange("userPersona", e.target.value)}
+            isLoading={isLoading}
           >
             {userPersonaOptions.map((userPersonaOption) => (
               <SelectItem className="text-white" key={userPersonaOption.key}>
@@ -84,7 +89,7 @@ export default function SelectInputWrapper({
                 "!cursor-text",
               ],
             }}
-            value={userProfile.bedroomNum?.toString() ?? ''}
+            value={userProfile.bedroomNum?.toString() ?? ""}
             onChange={(e) =>
               onProfileChange("bedroomNum", parseInt(e.target.value, 10))
             }
@@ -114,7 +119,7 @@ export default function SelectInputWrapper({
                 "!cursor-text",
               ],
             }}
-            value={userProfile.bathroomNum?.toString() ?? ''}
+            value={userProfile.bathroomNum?.toString() ?? ""}
             onChange={(e) =>
               onProfileChange("bathroomNum", parseInt(e.target.value, 10))
             }
@@ -143,7 +148,7 @@ export default function SelectInputWrapper({
                 "!cursor-text",
               ],
             }}
-            value={userProfile.livingRoomNum?.toString() ?? ''}
+            value={userProfile.livingRoomNum?.toString() ?? ""}
             onChange={(e) =>
               onProfileChange("livingRoomNum", parseInt(e.target.value, 10))
             }

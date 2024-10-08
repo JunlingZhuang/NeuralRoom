@@ -38,6 +38,7 @@ export const createSaveManager = (): SaveManager => {
     } catch (error) {
       console.error("Error saving state:", error);
     }
+    console.log("Save state:", state);
   };
 
   const loadState = async (index: number = 0): Promise<SavedState | null> => {
@@ -54,6 +55,7 @@ export const createSaveManager = (): SaveManager => {
     try {
       const serializedStates = localStorage.getItem(SAVED_STATES_KEY);
       return serializedStates ? JSON.parse(serializedStates) : [];
+      console.log("Get all states:", serializedStates);
     } catch (error) {
       console.error("Error getting all states:", error);
       return [];
