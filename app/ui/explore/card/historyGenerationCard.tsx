@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
 import { SavedState } from "@/app/lib/manager/saveManager";
 import { Node } from "@/app/lib/manager/graphManager";
@@ -11,6 +11,14 @@ export default function HistoryGenerationCard({
   savedState: SavedState;
   onDelete: () => void;
 }) {
+  const programCounts = useMemo(() => {
+    const counts: { [key: string]: number } = {};
+    savedState.graph.Nodes.forEach((node) => {
+      counts[node.programName] = (counts[node.programName] || 0) + 1;
+    });
+    return counts;
+  }, [savedState.graph.Nodes]);
+
   return (
     <div className="w-full h-48 p-4 shadow-2xl rounded-[16px] backdrop-blur-xl bg-panel-bg bg-opacity-60 justify-center transition-all ease-in-out duration-500 hover:h-[40vh] hover:min-h-[12rem] group hover:scale-[1.03] hover:overflow-hidden">
       <div className="w-full h-full flex flex-col gap-3 transition-all duration-500 ease-in-out">
@@ -30,16 +38,12 @@ export default function HistoryGenerationCard({
                 Information
               </div>
               <div className="flex flex-col text-xs text-gray-300 gap-1 font-light max-h-[calc(100%-1.5rem)] overflow-y-auto scrollbar-hide transition-all duration-500 ease-in-out">
-                {savedState.graph.Nodes.map((node: Node, index) => (
+                {Object.entries(programCounts).map(([programName, count], index) => (
                   <div
                     key={index}
                     className="transition-opacity duration-500 ease-in-out group-hover:opacity-100"
                   >
-                    {`${node.programName}Num: ${
-                      savedState.graph.Nodes.filter(
-                        (n) => n.programName === node.programName
-                      ).length
-                    }`}
+                    {`${programName}Num: ${count}`}
                   </div>
                 ))}
               </div>
