@@ -75,6 +75,7 @@ export default function HistoryGenerationCard({
                   <HistoryGenerationCardButtonGroup 
                     stateId={savedState.id} 
                     onDelete={onDelete}
+                    
                   />
                 </div>
               </div>
