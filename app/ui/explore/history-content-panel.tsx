@@ -6,16 +6,29 @@ import { useGenerationManager } from "@/app/lib/context/generationContext";
 import { SavedState } from "@/app/lib/manager/saveManager";
 
 export default function HistoryContentPanel() {
-  const { getAllSavedStates } = useGenerationManager();
+  const { getAllSavedStates, saveManager, stateUpdated, setStateUpdated } = useGenerationManager();
   const [allSavedStates, setAllSavedStates] = useState<SavedState[]>([]);
 
+  const fetchSavedStates = async () => {
+    const states = await getAllSavedStates();
+    setAllSavedStates(states);
+  };
+
   useEffect(() => {
-    const fetchSavedStates = async () => {
-      const states = await getAllSavedStates();
-      setAllSavedStates(states);
-    };
     fetchSavedStates();
   }, [getAllSavedStates]);
+
+  useEffect(() => {
+    if (stateUpdated) {
+      fetchSavedStates();
+      setStateUpdated(false);
+    }
+  }, [stateUpdated, setStateUpdated]);
+
+  const handleDelete = async (stateId: string) => {
+    await saveManager.deleteState(stateId);
+    fetchSavedStates(); // Refresh the list after deletion
+  };
 
   return (
     <div className="h-full overflow-y-auto scrollbar-thin scrollbar-webkit p-6 ">
@@ -24,8 +37,12 @@ export default function HistoryContentPanel() {
           <div className="flex justify-center text-lg font-normal">
             History Generation
           </div>
-          {allSavedStates.map((savedState, index) => (
-            <HistoryGenerationCard key={index} savedState={savedState} />
+          {allSavedStates.map((savedState) => (
+            <HistoryGenerationCard 
+              key={savedState.id} 
+              savedState={savedState} 
+              onDelete={() => handleDelete(savedState.id)}
+            />
           ))}
         </div>
       </div>

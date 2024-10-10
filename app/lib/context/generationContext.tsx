@@ -10,25 +10,36 @@ import {
   createGraphManager,
 } from "@/app/lib/manager/graphManager";
 import { fetchSamplePrompts } from "@/app/lib/data";
-import { SaveManager, createSaveManager, SavedState } from "@/app/lib/manager/saveManager";
-import { UserProfileManager, createUserProfileManager } from "@/app/lib/manager/userProfileManager";
+import {
+  SaveManager,
+  createSaveManager,
+  SavedState,
+} from "@/app/lib/manager/saveManager";
+import {
+  UserProfileManager,
+  createUserProfileManager,
+} from "@/app/lib/manager/userProfileManager";
 import { UserProfile } from "@/app/lib/definition/user_profile_definition";
 
 type GenerationManager = {
   modelManager: ModelManager;
   graphManager: GraphManager;
-  userProfileManager: UserProfileManager; // 新增
+  userProfileManager: UserProfileManager;
   getSamplePrompts: () => Promise<string[]>;
   saveManager: SaveManager;
   saveCurrentState: () => Promise<void>;
-  loadSavedState: (index?: number) => Promise<void>;
+  loadSavedState: (id: number) => Promise<void>;
   getAllSavedStates: () => Promise<SavedState[]>;
+  stateUpdated: boolean;
+  setStateUpdated: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const getSamplePrompts = async () => {
   try {
     const prompts = await fetchSamplePrompts();
-    const promptList = prompts.map((prompt: { prompt: string }) => prompt.prompt);
+    const promptList = prompts.map(
+      (prompt: { prompt: string }) => prompt.prompt
+    );
     return promptList;
   } catch (error) {
     console.error("Error fetching sample prompts:", error);
@@ -64,20 +75,24 @@ export const GenerationManagerProvider = ({
   const userProfileManager = createUserProfileManager();
 
   const saveCurrentState = async () => {
-    const currentState: SavedState = {
+    const currentState: Omit<SavedState, "id" | "timestamp"> = {
+      currentImage: modelManager.currentImage,
       graph: graphManager.graph,
       model: modelManager.model,
       boundingBoxSize: modelManager.boundingBoxSize,
       floorNum: modelManager.floorNum,
       bottomCenterPoint: modelManager.bottomCenterPoint,
       userProfile: userProfileManager.currentProfile,
-      timestamp: Date.now(),
     };
-    await saveManager.saveState(currentState);
+    await saveManager.saveState({
+      ...currentState,
+      id: Date.now().toString(),
+      timestamp: Date.now()
+    });
   };
 
-  const loadSavedState = async (index?: number) => {
-    const savedState = await saveManager.loadState(index);
+  const loadSavedState = async (id: number) => {
+    const savedState = await saveManager.loadState(id);
     if (savedState) {
       graphManager.updateGraph(savedState.graph);
       modelManager.updateModel(savedState.model);
@@ -92,12 +107,13 @@ export const GenerationManagerProvider = ({
   };
 
   const getAllSavedStates = async () => {
+    console.log("Get all saved states", await saveManager.getAllStates());
     return await saveManager.getAllStates();
   };
 
   const [stateUpdated, setStateUpdated] = useState(false);
 
-  const generationManager = {
+  const generationManager: GenerationManager = {
     modelManager,
     graphManager,
     userProfileManager,

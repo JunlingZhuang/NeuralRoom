@@ -14,6 +14,8 @@ export type BottomCenterPoint = {
 };
 
 export type ModelManager = {
+  currentImage: string | null;
+  updateCurrentImage: (image: string | null) => void;
   model: Blob | null;
   boundingBoxSize: BoundingBoxSize;
   floorNum: number;
@@ -28,7 +30,8 @@ export const createModelManager = (
   initialModel: Blob | null,
   initialBoundingBoxSize: BoundingBoxSize,
   initialFloorNum: number,
-  initialBottomCenterPoint: BottomCenterPoint
+  initialBottomCenterPoint: BottomCenterPoint,
+  initialCurrentImage: string | null = null
 ): ModelManager => {
   const [model, setModel] = useState<Blob | null>(initialModel);
   const [boundingBoxSize, setBoundingBoxSize] = useState<BoundingBoxSize>(
@@ -38,6 +41,7 @@ export const createModelManager = (
   const [bottomCenterPoint, setBottomCenterPoint] = useState<BottomCenterPoint>(
     initialBottomCenterPoint
   );
+  const [currentImage, setCurrentImage] = useState<string | null>(null);
 
   const updateModel = (newModel: Blob | null) => {
     setModel(newModel);
@@ -60,14 +64,20 @@ export const createModelManager = (
     setBottomCenterPoint(newBottomCenterPoint);
   };
 
+  const updateCurrentImage = (image: string | null) => {
+    setCurrentImage(image);
+  };
+
   return {
     model,
     boundingBoxSize,
     floorNum,
     bottomCenterPoint,
+    currentImage,
     updateModel,
     updateBoundingBoxSize,
     updateFloorNum,
     updateBottomCenterPoint,
+    updateCurrentImage,
   };
 };
