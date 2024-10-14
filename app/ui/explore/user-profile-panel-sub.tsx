@@ -7,10 +7,15 @@ import { RiRestartLine } from "react-icons/ri";
 import { UserProfile } from "@/app/lib/definition/user_profile_definition";
 // import { gen, useGenerationManager } from "@/app/lib/manager/";
 import { useGenerationManager } from "@/app/lib/context/generationContext";
-
+import { Graph } from "@/app/lib/manager/graphManager";
+import { generateProfileGraph_Backend } from "@/app/lib/data";
 
 export default function UserProfileSubPanel() {
   const { userProfileManager } = useGenerationManager();
+  const { graphManager, getSamplePrompts } = useGenerationManager();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInvalid, setIsInvalid] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     if (!userProfileManager.currentProfile) {
@@ -22,8 +27,33 @@ export default function UserProfileSubPanel() {
     userProfileManager.updateCurrentUserProfileField(field, value);
   };
 
-  const handleSaveAndGenerateGraph = () => {
-    console.log("Click on Save");
+  const handleSaveAndGenerateGraph = async () => {
+    const isProfileUnchanged =JSON.stringify(userProfileManager.defaultProfile)===JSON.stringify(userProfileManager.currentProfile);
+    if (isProfileUnchanged){
+      setErrorMessage("User does not input anything in the profile");
+      setIsInvalid(true);
+      return
+    }
+    setIsLoading(true);
+    console.log('current profile',userProfileManager.currentProfile)
+    try {
+      const rawGraphData = await generateProfileGraph_Backend(userProfileManager.currentProfile);
+      console.log('catched graph from backend',rawGraphData)
+      // const newGraph: Graph = await graphManager.handleGeneratedGraphData(
+      //   rawGraphData
+      // );
+
+      // if (newGraph.Nodes.length !== 0 && newGraph.Edges.length !== 0) {
+      //   graphManager.updateGraph(newGraph);
+      // } else {
+      //   setIsInvalid(true);
+      //   setErrorMessage("Please input a valid prompt.");
+      // }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
   const handleRestart = () => {
     userProfileManager.createDefaultProfile();

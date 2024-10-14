@@ -6,6 +6,7 @@ import {
 } from "@/app/lib/definition/user_profile_definition";
 
 export type UserProfileManager = {
+  defaultProfile:UserProfile;
   currentProfile: UserProfile;
   createDefaultProfile: () => void;
   updateWholeCurrentProfile: (updates: Partial<UserProfile>) => void;
@@ -51,6 +52,7 @@ export const createUserProfileManager = (): UserProfileManager => {
   };
 
   return {
+    defaultProfile,
     currentProfile,
     createDefaultProfile,
     updateWholeCurrentProfile,
