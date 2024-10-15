@@ -10,12 +10,21 @@ import { useGenerationManager } from "@/app/lib/context/generationContext";
 import { Graph } from "@/app/lib/manager/graphManager";
 import { generateProfileGraph_Backend } from "@/app/lib/data";
 
-export default function UserProfileSubPanel() {
-  const { userProfileManager } = useGenerationManager();
-  const { graphManager, getSamplePrompts } = useGenerationManager();
-  const [isLoading, setIsLoading] = useState(false);
+interface UserProfileSubPanelProps {
+  ifUserProfileFinishedLoading: boolean;
+  setIfUserProfileFinishedLoading: (
+    ifUserProfileFinishedLoading: boolean
+  ) => void;
+}
+
+export default function UserProfileSubPanel({
+  ifUserProfileFinishedLoading,
+  setIfUserProfileFinishedLoading,
+}: UserProfileSubPanelProps) {
+  const { userProfileManager, graphManager } = useGenerationManager();
   const [isInvalid, setIsInvalid] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!userProfileManager.currentProfile) {
@@ -23,22 +32,30 @@ export default function UserProfileSubPanel() {
     }
   }, [userProfileManager]);
 
-  const handleProfileChange = (field: keyof UserProfile, value: string | number) => {
+  const handleProfileChange = (
+    field: keyof UserProfile,
+    value: string | number
+  ) => {
     userProfileManager.updateCurrentUserProfileField(field, value);
   };
 
   const handleSaveAndGenerateGraph = async () => {
-    const isProfileUnchanged =JSON.stringify(userProfileManager.defaultProfile)===JSON.stringify(userProfileManager.currentProfile);
-    if (isProfileUnchanged){
+    const isProfileUnchanged =
+      JSON.stringify(userProfileManager.defaultProfile) ===
+      JSON.stringify(userProfileManager.currentProfile);
+    if (isProfileUnchanged) {
       setErrorMessage("User does not input anything in the profile");
       setIsInvalid(true);
-      return
+      return;
     }
+    setIfUserProfileFinishedLoading(false);
     setIsLoading(true);
-    console.log('current profile',userProfileManager.currentProfile)
+    console.log("current profile", userProfileManager.currentProfile);
     try {
-      const rawGraphData = await generateProfileGraph_Backend(userProfileManager.currentProfile);
-      console.log('catched graph from backend',rawGraphData)
+      const rawGraphData = await generateProfileGraph_Backend(
+        userProfileManager.currentProfile
+      );
+      console.log("catched graph from backend", rawGraphData);
       const newGraph: Graph = await graphManager.handleGeneratedGraphData(
         rawGraphData
       );
@@ -53,6 +70,7 @@ export default function UserProfileSubPanel() {
       console.error("Error:", error);
     } finally {
       setIsLoading(false);
+      setIfUserProfileFinishedLoading(true);
     }
   };
   const handleRestart = () => {
@@ -78,7 +96,7 @@ export default function UserProfileSubPanel() {
         />
       </div>
       <UserProfileButtonGroup //userprofile
-        isLoading={false}
+        isLoading={isLoading}
         isRandomButtonVisible={false}
         randomButtonOnClick={handleRandomBtnClick}
         LeftContentButtonLabel="Restart"

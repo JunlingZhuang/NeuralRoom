@@ -1,0 +1,14 @@
+[
+  {
+    "prompt": {
+      "socialInfoPrompt": "A layout designed for a single professional who works from home and enjoys painting. They need a dedicated workspace and an art studio.",
+      "familyInfoPrompt": "A layout designed for a family of 3, where the parents share a bedroom, and the father works from home."
+    }
+  },
+  {
+    "prompt": {
+      "socialInfoPrompt": "A graduate student who needs a quiet place to study.",
+      "familyInfoPrompt": "Occasionally hosts study groups."
+    }
+  }
+]
