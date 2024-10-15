@@ -50,60 +50,13 @@ Input: A layout designed for a family of 3, where the parents share a bedroom, a
 
 Output:
 
-**Step 1: Determine Headcounts and Basic Room Requirements**
+Step 1: ['bedroom', 'bedroom', 'bathroom', 'bathroom']
 
-- **Headcount Determination**:
-  - Total occupants: 3 people.
+Step 2: ['bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'library']
 
-- **Bedroom Requirements**:
-  - Parents share a bedroom: 1 bedroom.
-  - One child requires a bedroom: 1 bedroom.
-  - Total bedrooms: 2 bedrooms.
+Step 3: [(0, 2), (1, 3), (0, 4), (1, 4), (4, 5), (0, 6)]
 
-- **Bathroom Requirements**:
-  - For 3 people, include 2 bathrooms for convenience.
-  - Total bathrooms: 2 bathrooms.
-
-- **Basic Room List**:
-['bedroom', 'bedroom', 'bathroom', 'bathroom']
-
-**Step 2: Infer Additional Rooms**
-- **Livingroom**:
-- Include 1 living room for family activities.
-
-- **Kitchen**:
-- Necessary for meal preparation.
-
-- **Library**:
-- Father works from home.
-- Include 1 library or home office.
-
-- **Updated Room List**:
-['bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'library']
-
-**Step 3: Determine Room Adjacency**
-
-- **Assign Indexes**:
-Index Room Type 
-0 bedroom (parents) 
-1 bedroom (child) 
-2 bathroom 
-3 bathroom 
-4 livingroom 
-5 kitchen 
-6 library
-
-- **Adjacency Analysis**:
-- Bedroom (index 0) connected to bathroom (index 2): (0, 2)
-- Bedroom (index 1) connected to bathroom (index 3): (1, 3)
-- Bedrooms connected to livingroom (index 4): (0, 4), (1, 4)
-- Livingroom connected to kitchen (index 5): (4, 5)
-- Bedroom (index 0) connected to library (index 6): (0, 6)
-
-- **Adjacency List**:
-[(0, 2), (1, 3), (0, 4), (1, 4), (4, 5), (0, 6)]
-
-**Step 4: Output the Room List and Adjacency List**
+Step 4: 
 {
   'Room List': ['bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'library'],
 'Adjacency List': [(0, 2), (1, 3), (0, 4), (1, 4), (4, 5), (0, 6)]
@@ -116,54 +69,13 @@ Input: A layout designed for a single professional who works from home and enjoy
 
 Output:
 
-**Step 1: Determine Headcounts and Basic Room Requirements**
+Step 1: ['bedroom', 'bathroom']
 
-- **Headcount Determination**:
-  - Total occupants: 1 person.
+Step 2: ['bedroom', 'bathroom', 'livingroom', 'kitchen', 'library', 'library']
 
-- **Bedroom Requirements**:
-  - 1 bedroom.
+Step 3: [(0, 1), (2, 3), (2, 4), (2, 5), (4, 5)]
 
-- **Bathroom Requirements**:
-  - 1 bathroom.
-
-- **Basic Room List**:
-['bedroom', 'bathroom']
-
-**Step 2: Infer Additional Rooms**
-
-- **Livingroom**:
-- Include 1 living room.
-
-- **Kitchen**:
-- Necessary for meal preparation.
-
-- **Library**:
-- Needs a dedicated workspace and an art studio.
-- Include 2 libraries (one for workspace, one for art studio).
-
-- **Updated Room List**:
-['bedroom', 'bathroom', 'livingroom', 'kitchen', 'library', 'library']
-**Step 3: Determine Room Adjacency**
-
-- **Assign Indexes**:
-Index Room Type 
-0 bedroom 
-1 bathroom 
-2 livingroom 
-3 kitchen 
-4 library (workspace) 
-5 library (art studio)
-- **Adjacency Analysis**:
-- Bedroom (index 0) connected to bathroom (index 1): (0, 1)
-- Livingroom (index 2) connected to kitchen (index 3): (2, 3)
-- Livingroom connected to libraries (indexes 4 and 5): (2, 4), (2, 5)
-- Libraries connected to each other: (4, 5)
-
-- **Adjacency List**:
-[(0, 1), (2, 3), (2, 4), (2, 5), (4, 5)]
-
-**Step 4: Output the Room List and Adjacency List**
+Step 4: 
 {
   'Room List': ['bedroom', 'bathroom', 'livingroom', 'kitchen', 'library', 'library'],
 'Adjacency List': [(0, 1), (2, 3), (2, 4), (2, 5), (4, 5)]
@@ -175,66 +87,13 @@ Input: A layout designed for a multi-generational family of 6, including grandpa
 
 Output:
 
-**Step 1: Determine Headcounts and Basic Room Requirements**
+Step 1: ['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom']
 
-- **Headcount Determination**:
-  - Total occupants: 6 people.
+Step 2: ['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'circulation']
 
-- **Bedroom Requirements**:
-  - Grandparents: 1 bedroom.
-  - Parents: 1 bedroom.
-  - Children: 1 bedroom (shared).
-  - Total bedrooms: 3 bedrooms.
+Step 3: [(0, 3), (1, 4), (2, 4), (0, 8), (1, 8), (2, 8), (8, 5), (5, 6), (5, 7), (6, 7)]
 
-- **Bathroom Requirements**:
-  - For 6 people, include 2 bathrooms.
-  - Total bathrooms: 2 bathrooms.
-
-- **Basic Room List**:
-['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom']
-
-**Step 2: Infer Additional Rooms**
-
-- **Livingroom**:
-- Include 1 living room for family gatherings.
-
-- **Kitchen**:
-- Necessary for meal preparation.
-
-- **Diningroom**:
-- Include 1 dining room for shared meals.
-
-- **Circulation**:
-- Needed for connectivity in a large unit.
-
-- **Updated Room List**:
-['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'circulation']
-
-**Step 3: Determine Room Adjacency**
-
-- **Assign Indexes**:
-Index Room Type 
-0 bedroom (grandparents) 
-1 bedroom (parents) 
-2 bedroom (children) 
-3 bathroom (near grandparents) 
-4 bathroom 
-5 livingroom 
-6 kitchen 
-7 diningroom 
-8 circulation
-- **Adjacency Analysis**:
-- Grandparents' bedroom (index 0) connected to bathroom (index 3): (0, 3)
-- Parents' and children's bedrooms (indexes 1, 2) connected to bathroom (index 4): (1, 4), (2, 4)
-- All bedrooms connected to circulation (index 8): (0, 8), (1, 8), (2, 8)
-- Circulation connected to livingroom (index 5): (8, 5)
-- Livingroom connected to kitchen (index 6) and diningroom (index 7): (5, 6), (5, 7)
-- Kitchen connected to diningroom: (6, 7)
-
-- **Adjacency List**:
-[(0, 3), (1, 4), (2, 4), (0, 8), (1, 8), (2, 8), (8, 5), (5, 6), (5, 7), (6, 7)]
-
-**Step 4: Output the Room List and Adjacency List**
+Step 4:
 {
   'Room List':['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'circulation'],
 'Adjacency List': [(0, 3), (1, 4), (2, 4), (0, 8), (1, 8), (2, 8), (8, 5), (5, 6), (5, 7), (6, 7)]
@@ -247,60 +106,12 @@ Input: A layout designed for a family of 4, with frequent guests. The parents sh
 
 Output:
 
-**Step 1: Determine Headcounts and Basic Room Requirements**
+Step 1: ['bedroom', 'bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom']
 
-- **Headcount Determination**:
-  - Total permanent occupants: 4 people.
-  - Frequent guests require an additional bedroom.
-  - Total bedrooms: 4 bedrooms (parents, child 1, child 2, guest room).
+Step 2: ['bedroom', 'bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'circulation']
 
-- **Bathroom Requirements**:
-  - For 4+ people, include at least 2 bathrooms.
-  - Total bathrooms: 2 bathrooms.
-
-- **Basic Room List**:
-['bedroom', 'bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom']
-**Step 2: Infer Additional Rooms**
-
-- **Livingroom**:
-- Include 1 living room for family and guests.
-
-- **Kitchen**:
-- Necessary for meal preparation.
-
-- **Diningroom**:
-- Include 1 dining room for meals and entertaining.
-
-- **Circulation**:
-- Needed for connectivity.
-
-- **Updated Room List**:
-['bedroom', 'bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'circulation']
-**Step 3: Determine Room Adjacency**
-
-- **Assign Indexes**:
-Index Room Type 
-0 bedroom (parents) 
-1 bedroom (child 1) 
-2 bedroom (child 2) 
-3 bedroom (guest) 
-4 bathroom 
-5 bathroom 
-6 livingroom 
-7 kitchen 
-8 diningroom 
-9 circulation
-
-- **Adjacency Analysis**:
-- Bedrooms connected to bathrooms: (0, 4), (1, 5), (2, 5), (3, 5)
-- All bedrooms connected to circulation: (0, 9), (1, 9), (2, 9), (3, 9)
-- Circulation connected to livingroom: (9, 6)
-- Livingroom connected to kitchen and diningroom: (6, 7), (6, 8)
-- Kitchen connected to diningroom: (7, 8)
-
-- **Adjacency List**:
-[(0, 4), (1, 5), (2, 5), (3, 5), (0, 9), (1, 9), (2, 9), (3, 9), (9, 6), (6, 7), (6, 8), (7, 8)]
-**Step 4: Output the Room List and Adjacency List**
+Step 3: [(0, 4), (1, 5), (2, 5), (3, 5), (0, 9), (1, 9), (2, 9), (3, 9), (9, 6), (6, 7), (6, 8), (7, 8)]
+Step 4: 
 {
   'Room List':['bedroom', 'bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'circulation'],
 'Adjacency List': [(0, 4), (1, 5), (2, 5), (3, 5), (0, 9), (1, 9), (2, 9), (3, 9), (9, 6), (6, 7), (6, 8), (7, 8)]

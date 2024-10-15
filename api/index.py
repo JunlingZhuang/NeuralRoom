@@ -117,6 +117,7 @@ def generate_userprofile_graph():
     data = request.json
     classes_dict = dataset.classes
     rel_dict = dataset.relationships_dict
+    print(data)
     try:
         room_list, adj_list = make_LLM_request(
             str(data), classes_dict, rel_dict, use_profile=True
@@ -134,9 +135,7 @@ def generate_userprofile_graph():
         "edges": adj_list,  # a list of [source id,type,target id]
     }
 
-    # return jsonify(response)
-    test_response = {"test": "hello"}
-    return jsonify(test_response)
+    return jsonify(response)
 
 
 @app.route("/api/openai", methods=["GET"])

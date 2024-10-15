@@ -47,7 +47,6 @@ export const createUserProfileManager = (): UserProfileManager => {
       ...currentProfile,
       [field]: value,
     };
-    console.log(`Update Current User Profile Field: ${field}: ${value}`);
     setCurrentProfile(updatedProfile);
   };
 

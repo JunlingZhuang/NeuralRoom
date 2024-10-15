@@ -98,185 +98,98 @@ Format:[(room_index1, room_index2), (room_index3, room_index4), ...]
 EXAMPLE1_PROFILE = """
 Input:
 {
-'userPersona': 'family_with_kids',
-'bedroomNum': 3,
-'bathroomNum': 2,
-'livingRoomNum': None,
-'familyInfoPrompt': 'A family of four with two school-age children.',
-'socialInfoPrompt': 'We enjoy hosting dinner parties and need space for kids to play.'
+  'userPersona': 'family_with_kids',
+  'bedroomNum': 3,
+  'bathroomNum': 2,
+  'livingRoomNum': None,
+  'familyInfoPrompt': 'A family of four with two school-age children.',
+  'socialInfoPrompt': 'We enjoy hosting dinner parties and need space for kids to play.'
 }
 
 Output:
 Step1: Determine Headcounts and Basic Room Requirements
 
-- Headcount Determination:
-From 'familyInfoPrompt': "A family of four with two school-age children."
-Total occupants: 4 people.
-
-- Bedroom Requirements:
-'bedroomNum' is 3, as specified.
-
-- Bathroom Requirements:
-'bathroomNum' is 2, as specified.
-
+- Total occupants: 4 people.
+- Bedrooms: 3 (as specified).
+- Bathrooms: 2 (as specified).
 - Basic Room List:
-['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom']
+  ['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom']
 
 Step2: Infer Additional Rooms
 
-- livingroom:
-'livingRoomNum' is None.
-Assume 1 living room (common in family homes).
-
-- kitchen:
-Necessary for meal preparation.
-
-- diningroom:
-Inferred from 'socialInfoPrompt': "We enjoy hosting dinner parties."
-Include 1 dining room for hosting dinners.
-
-- circulation:
-Needed for connectivity between rooms in a large unit.
-
-- storage:
-Inferred from 'socialInfoPrompt' and 'userPersona'.
-Include 1 storage room.
-
-- courtyard:
-No specific mention of an exterior space.
-Do not include a courtyard.
-
-- library:
-No mention of working or studying at home.
-Do not include a library.
-
-- service:
-Not specified.
-Do not include a service room.
-
+- Livingroom: Include 1 (common for families).
+- Kitchen: Necessary for meal preparation.
+- Diningroom: Inferred from "hosting dinner parties".
+- Storage: Families often require storage space.
+- Circulation: Needed for connectivity.
 - Updated Room List:
-['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'storage', 'circulation']
+  ['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'storage', 'circulation']
 
 Step3: Determine Room Adjacency
 
-- Assign Indexes:
-Index  Room Type
-0      bedroom
-1      bedroom
-2      bedroom
-3      bathroom
-4      bathroom
-5      livingroom
-6      kitchen
-7      diningroom
-8      storage
-9      circulation
-
-- Adjacency Analysis:
-Bedrooms (indexes 0, 1, 2) connected to circulation (index 9): (0, 9), (1, 9), (2, 9)
-Bathrooms (indexes 3, 4) connected to circulation (index 9): (3, 9), (4, 9)
-Living Room (index 5) connected to circulation (index 9), kitchen (index 6), and dining room (index 7): (5, 9), (5, 6), (5, 7)
-Kitchen (index 6) connected to dining room (index 7): (6, 7)
-Storage (index 8) connected to circulation (index 9): (8, 9)
+- Adjacency List:
+  - Bedrooms (0,1,2) connected to circulation (9): (0,9), (1,9), (2,9)
+  - Bathrooms (3,4) connected to circulation (9): (3,9), (4,9)
+  - Livingroom (5) connected to circulation (9), kitchen (6), diningroom (7): (5,9), (5,6), (5,7)
+  - Kitchen (6) connected to diningroom (7): (6,7)
+  - Storage (8) connected to circulation (9): (8,9)
 
 Step4: Output the Room List and Adjacency List
 
 {
-'Room List':
-['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'storage', 'circulation'],
-'Adjacency List':
-[(0, 9), (1, 9), (2, 9), (3, 9), (4, 9), (5, 9), (5, 6), (5, 7), (6, 7), (8, 9)]
+  'Room List':
+    ['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'storage', 'circulation'],
+  'Adjacency List':
+    [(0,9), (1,9), (2,9), (3,9), (4,9), (5,9), (5,6), (5,7), (6,7), (8,9)]
 }
 ---
 """
-
 
 EXAMPLE2_PROFILE = """
 Input:
 {
-'userPersona': 'Student',
-'bedroomNum': None,
-'bathroomNum': None,
-'livingRoomNum': None,
-'familyInfoPrompt': 'A graduate student who needs a quiet place to study.',
-'socialInfoPrompt': 'Occasionally hosts study groups.'
+  'userPersona': 'Student',
+  'bedroomNum': None,
+  'bathroomNum': None,
+  'livingRoomNum': None,
+  'familyInfoPrompt': 'A graduate student who needs a quiet place to study.',
+  'socialInfoPrompt': 'Occasionally hosts study groups.'
 }
 
 Output:
 Step1: Determine Headcounts and Basic Room Requirements
 
-- Headcount Determination:
-From 'familyInfoPrompt': "A graduate student who needs a quiet place to study."
-Total occupants: 1 person.
-
-- Bedroom Requirements:
-'bedroomNum' is None.
-Assume 1 bedroom.
-
-- Bathroom Requirements:
-'bathroomNum' is None.
-Assume 1 bathroom.
-
+- Total occupants: 1 person.
+- Bedrooms: Assume 1.
+- Bathrooms: Assume 1.
 - Basic Room List:
-['bedroom', 'bathroom']
+  ['bedroom', 'bathroom']
 
 Step2: Infer Additional Rooms
 
-- livingroom:
-'livingRoomNum' is None.
-Include 1 living room for hosting study groups.
-
-- kitchen:
-Necessary for meal preparation.
-
-- library:
-Inferred from 'familyInfoPrompt': "needs a quiet place to study."
-Include 1 library or study room.
-
-- circulation:
-Needed for connectivity between rooms.
-
-- storage:
-Not specifically mentioned.
-Do not include storage.
-
-- courtyard:
-No mention of outdoor space.
-Do not include a courtyard.
-
-- service:
-Not specified.
-Do not include a service room.
-
+- Livingroom: For hosting study groups.
+- Kitchen: Necessary.
+- Library: For studying.
+- Circulation: Needed for connectivity.
 - Updated Room List:
-['bedroom', 'bathroom', 'livingroom', 'kitchen', 'library', 'circulation']
+  ['bedroom', 'bathroom', 'livingroom', 'kitchen', 'library', 'circulation']
 
 Step3: Determine Room Adjacency
 
-- Assign Indexes:
-Index  Room Type
-0      bedroom
-1      bathroom
-2      livingroom
-3      kitchen
-4      library
-5      circulation
-
-- Adjacency Analysis:
-Bedroom (index 0) connected to circulation (index 5): (0, 5)
-Bathroom (index 1) connected to circulation (index 5): (1, 5)
-Living Room (index 2) connected to circulation (index 5), kitchen (index 3), and library (index 4): (2, 5), (2, 3), (2, 4)
+- Adjacency List:
+  - Bedroom (0) connected to circulation (5): (0,5)
+  - Bathroom (1) connected to circulation (5): (1,5)
+  - Livingroom (2) connected to circulation (5), kitchen (3), library (4): (2,5), (2,3), (2,4)
 
 Step4: Output the Room List and Adjacency List
 
 {
-'Room List':
-['bedroom', 'bathroom', 'livingroom', 'kitchen', 'library', 'circulation'],
-'Adjacency List':
-[(0, 5), (1, 5), (2, 5), (2, 3), (2, 4)]
+  'Room List':
+    ['bedroom', 'bathroom', 'livingroom', 'kitchen', 'library', 'circulation'],
+  'Adjacency List':
+    [(0,5), (1,5), (2,5), (2,3), (2,4)]
 }
----
-"""
+---"""
 
 
 def make_profile_sysprompt():
