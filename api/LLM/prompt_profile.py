@@ -184,7 +184,6 @@ Step4: Output the Room List and Adjacency List
 {
 'Room List':
 ['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'storage', 'circulation'],
-
 'Adjacency List':
 [(0, 9), (1, 9), (2, 9), (3, 9), (4, 9), (5, 9), (5, 6), (5, 7), (6, 7), (8, 9)]
 }
@@ -273,7 +272,6 @@ Step4: Output the Room List and Adjacency List
 {
 'Room List':
 ['bedroom', 'bathroom', 'livingroom', 'kitchen', 'library', 'circulation'],
-
 'Adjacency List':
 [(0, 5), (1, 5), (2, 5), (2, 3), (2, 4)]
 }
