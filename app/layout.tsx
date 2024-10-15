@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="overflow-y-hidden">
+      <body className="dark overflow-y-hidden">
         <Providers>
           <div className=" flex h-screen flex-col">
             <div className="bg-black nav-container px-6 pt-4">

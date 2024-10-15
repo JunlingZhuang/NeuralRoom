@@ -1,4 +1,5 @@
 "use client";
+import HyperText from "@/components/ui/hyper-text";
 
 import React from "react";
 import {
@@ -10,7 +11,7 @@ import {
 } from "@nextui-org/react";
 import { usePathname } from "next/navigation";
 
-const links = [
+export const links = [
   { name: "Explore", href: "/explore" },
   { name: "Collections", href: "/collections" },
   { name: "About", href: "/about" },
@@ -45,7 +46,10 @@ export default function NavBars() {
       }}
     >
       <NavbarBrand>
-        <p className="text-3xl text-inherit">NeuralRoom</p>
+        <HyperText
+          className="text-4xl font-bold text-black dark:text-white"
+          text="NeuralRoom"
+        />
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-20" justify="center">
         {links.map((link) => (
