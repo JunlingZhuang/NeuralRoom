@@ -1,4 +1,5 @@
-import { UserProfilePersonaOptionProps } from "@/app/lib/definition/user_profile_definition";
+import { UserProfile,UserProfilePersonaOptionProps } from "@/app/lib/definition/user_profile_definition";
+
 
 export async function fetchSamplePrompts() {
   const response = await fetch("initial_data/samplePrompts.json");
@@ -96,6 +97,31 @@ export const generateGraph_Backend = async (primaryPrompt: string) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ text: primaryPrompt }), // Sending the textarea value as JSON
+    });
+
+    if (response.ok) {
+      const generatedGraphdata = await response.json();
+      console.log("Backend graph:", generatedGraphdata);
+      // Use fetchLLMGraphData to process the received data and update the graph
+      return generatedGraphdata;
+    } else {
+      console.error("Failed to send data to the backend.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+
+// change input
+export const generateProfileGraph_Backend = async (userProfile: UserProfile) => {
+  try {
+    const response = await fetch("/api/profile2graph", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userProfile), // Sending the textarea value as JSON
     });
 
     if (response.ok) {

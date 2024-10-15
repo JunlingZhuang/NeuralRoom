@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Tuple
 from LLM.prompt_basic import make_basic_input_prompt, make_basic_sysprompt
+from LLM.prompt_profile import make_profile_sysprompt
 from openai import OpenAI
 import os
 
@@ -10,10 +11,16 @@ class RoomAdjacency(BaseModel):
     room2: int
 
 
+class RoomGraph(BaseModel):
+    roomlist: List[str]
+    adjacencylist: List[RoomAdjacency]
+
+
 class OutputGraph(BaseModel):
-    step1: List[str]
-    step2: List[str]
-    step3: List[RoomAdjacency]
+    step1: str
+    step2: str
+    step3: str
+    step4: RoomGraph
 
 
 def process_LLM_output(classes_dict, rel_dict, LLM_output=None):
@@ -29,21 +36,25 @@ def process_LLM_output(classes_dict, rel_dict, LLM_output=None):
 
     """
 
-    room_str_list = LLM_output.step2
+    room_graph = LLM_output.step4
+    room_str_list = room_graph.roomlist
     room_list = [classes_dict[rm] for rm in room_str_list]
     adj_id = rel_dict.get("adjacent to")
-    adj_list = [[adj.room1, adj_id, adj.room2] for adj in LLM_output.step3]
+    adj_list = [[adj.room1, adj_id, adj.room2] for adj in room_graph.adjacencylist]
     return room_list, adj_list
 
 
-def make_LLM_request(input, classes_dict, rel_dict):
+def make_LLM_request(input, classes_dict, rel_dict, use_profile=False):
     api_key = os.getenv("OPENAI_API_KEY")
     client = OpenAI(api_key=api_key)
-    sysprompt = make_basic_sysprompt()
+    if use_profile:
+        sysprompt = make_profile_sysprompt()
+    else:
+        sysprompt = make_basic_sysprompt()
     input = make_basic_input_prompt(input)
 
     completion = client.beta.chat.completions.parse(
-        model="gpt-4o-2024-08-06",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": sysprompt},
             {"role": "user", "content": input},

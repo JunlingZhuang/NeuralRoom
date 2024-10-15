@@ -111,10 +111,38 @@ def generate_graph():
 
     return jsonify(response)
 
-@app.route("/api/openai", methods = ["GET"])
+
+@app.route("/api/profile2graph", methods=["POST"])
+def generate_userprofile_graph():
+    data = request.json
+    classes_dict = dataset.classes
+    rel_dict = dataset.relationships_dict
+    print(data)
+    try:
+        room_list, adj_list = make_LLM_request(
+            str(data), classes_dict, rel_dict, use_profile=True
+        )
+
+        # Process the text_value as needed
+        print(f"room_list {room_list}")
+        print(f"adj_list {adj_list}")
+    except Exception:
+        print(f"Error with OpenAI requests {Exception}")
+        return jsonify({"error": "OpenAI requests failed"}), 404
+
+    response = {
+        "nodes": room_list,  # a list of program type index
+        "edges": adj_list,  # a list of [source id,type,target id]
+    }
+
+    return jsonify(response)
+
+
+@app.route("/api/openai", methods=["GET"])
 def get_openAIApiKey():
     apikey = os.getenv("OPENAI_API_KEY")
     return jsonify({"Open AI Apikey": apikey})
+
 
 @app.route("/health", methods=["GET"])
 def health_check():

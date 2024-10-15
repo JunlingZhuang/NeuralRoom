@@ -251,11 +251,14 @@ def generate_queried_unit_mesh(
         360 / angle_num
     )
 
+    # round angles
+    angles_pred = torch.round(angles_pred / 90) * 90
+
     boxes_pred_den = batch_torch_denormalize_box_params(
         boxes_pred[:, :6],
         file=box_file,
         device=args["device"],
-        scale=args.get("norm_scale", 3),
+        scale=args.get("norm_scale", 1),
     )
 
     box_points, denormalized_boxes, angles_pred = rationalize_box_params(
@@ -268,7 +271,7 @@ def generate_queried_unit_mesh(
         new_obj2pidx,
         adj_rel_idx,
         norm_scale=args.get("norm_scale", 1),
-        module_dim=0.1,
+        module_dim=0.5,
     )
 
     detailed_obj_class = list(train_dataset.classes.keys())
