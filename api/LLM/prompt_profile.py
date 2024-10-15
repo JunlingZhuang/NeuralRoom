@@ -281,8 +281,3 @@ Step4: Output the Room List and Adjacency List
 
 def make_profile_sysprompt():
     return INSTRUCTION_PROFILE + EXAMPLE1_PROFILE + EXAMPLE2_PROFILE
-
-
-def make_basic_input_prompt(input):
-    prompt = "Input: " + input + "\n" + "Output:"
-    return prompt

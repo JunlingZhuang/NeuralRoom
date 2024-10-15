@@ -115,24 +115,24 @@ def generate_graph():
 @app.route("/api/profile2graph", methods=["POST"])
 def generate_userprofile_graph():
     data = request.json
-    print(data)
-    text_value = data.get("text")
     classes_dict = dataset.classes
     rel_dict = dataset.relationships_dict
-    # try:
-    #     room_list, adj_list = make_LLM_request(text_value, classes_dict, rel_dict)
+    try:
+        room_list, adj_list = make_LLM_request(
+            str(data), classes_dict, rel_dict, use_profile=True
+        )
 
-    #     # Process the text_value as needed
-    #     print(f"room_list {room_list}")
-    #     print(f"adj_list {adj_list}")
-    # except Exception:
-    #     print(f"Error with OpenAI requests {Exception}")
-    #     return jsonify({"error": "OpenAI requests failed"}), 404
+        # Process the text_value as needed
+        print(f"room_list {room_list}")
+        print(f"adj_list {adj_list}")
+    except Exception:
+        print(f"Error with OpenAI requests {Exception}")
+        return jsonify({"error": "OpenAI requests failed"}), 404
 
-    # response = {
-    #     "nodes": room_list,  # a list of program type index
-    #     "edges": adj_list,  # a list of [source id,type,target id]
-    # }
+    response = {
+        "nodes": room_list,  # a list of program type index
+        "edges": adj_list,  # a list of [source id,type,target id]
+    }
 
     # return jsonify(response)
     test_response = {"test": "hello"}

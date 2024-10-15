@@ -39,16 +39,16 @@ export default function UserProfileSubPanel() {
     try {
       const rawGraphData = await generateProfileGraph_Backend(userProfileManager.currentProfile);
       console.log('catched graph from backend',rawGraphData)
-      // const newGraph: Graph = await graphManager.handleGeneratedGraphData(
-      //   rawGraphData
-      // );
+      const newGraph: Graph = await graphManager.handleGeneratedGraphData(
+        rawGraphData
+      );
 
-      // if (newGraph.Nodes.length !== 0 && newGraph.Edges.length !== 0) {
-      //   graphManager.updateGraph(newGraph);
-      // } else {
-      //   setIsInvalid(true);
-      //   setErrorMessage("Please input a valid prompt.");
-      // }
+      if (newGraph.Nodes.length !== 0 && newGraph.Edges.length !== 0) {
+        graphManager.updateGraph(newGraph);
+      } else {
+        setIsInvalid(true);
+        setErrorMessage("Please input a valid prompt.");
+      }
     } catch (error) {
       console.error("Error:", error);
     } finally {
