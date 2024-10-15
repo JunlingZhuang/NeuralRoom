@@ -47,7 +47,7 @@ export default function NavBars() {
     >
       <NavbarBrand>
         <HyperText
-          className="text-4xl font-bold text-black dark:text-white"
+          className="text-4xl font-bold text-white dark:text-white"
           text="NeuralRoom"
         />
       </NavbarBrand>
