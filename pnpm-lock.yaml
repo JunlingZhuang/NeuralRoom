@@ -117,6 +117,9 @@ importers:
       '@types/react':
         specifier: 18.2.6
         version: 18.2.6
+      '@types/react-transition-group':
+        specifier: ^4.4.11
+        version: 4.4.11
       '@types/three':
         specifier: ^0.165.0
         version: 0.165.0
@@ -1431,6 +1434,9 @@ packages:
 
   '@types/react-reconciler@0.28.8':
     resolution: {integrity: sha512-SN9c4kxXZonFhbX4hJrZy37yw9e7EIxcpHCxQv5JUS18wDE5ovkQKlqQEkufdJCCMfuI9BnjUJvhYeJ9x5Ra7g==}
+
+  '@types/react-transition-group@4.4.11':
+    resolution: {integrity: sha512-RM05tAniPZ5DZPzzNFP+DmrcOdD0efDUxMy3145oljWSl3x9ZV5vhme98gTxFrj2lhXvmGNnUiuDyJgY9IKkNA==}
 
   '@types/react@18.2.6':
     resolution: {integrity: sha512-wRZClXn//zxCFW+ye/D2qY65UsYP1Fpex2YXorHc8awoNamkMZSvBxwxdYVInsHOZZd2Ppq8isnSzJL5Mpf8OA==}
@@ -5618,6 +5624,10 @@ snapshots:
       '@types/react': 18.2.6
 
   '@types/react-reconciler@0.28.8':
+    dependencies:
+      '@types/react': 18.2.6
+
+  '@types/react-transition-group@4.4.11':
     dependencies:
       '@types/react': 18.2.6
 
