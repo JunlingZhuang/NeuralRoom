@@ -47,8 +47,8 @@ export default function NavBars() {
     >
       <NavbarBrand>
         <HyperText
-          className="text-4xl font-bold text-black dark:text-white"
-          text="NeuralRoom"
+          className="text-4xl font-bold text-white dark:text-white"
+          text="Nestwork"
         />
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-20" justify="center">
