@@ -11,8 +11,13 @@ class RoomAdjacency(BaseModel):
     room2: int
 
 
+class Room(BaseModel):
+    index: int
+    room_type: str
+
+
 class RoomGraph(BaseModel):
-    roomlist: Dict[str, str]
+    roomlist: List[Room]
     adjacencylist: List[RoomAdjacency]
 
 
@@ -38,8 +43,8 @@ def process_LLM_output(classes_dict, rel_dict, LLM_output=None):
     """
 
     room_graph = LLM_output.step5
-    room_str_list = room_graph.roomlist
-    room_list = [classes_dict[rm] for rm in room_str_list.values()]
+    room_str_list = [room.room_type for room in room_graph.roomlist]
+    room_list = [classes_dict[rm] for rm in room_str_list]
     adj_id = rel_dict.get("adjacent to")
     adj_list = [[adj.room1, adj_id, adj.room2] for adj in room_graph.adjacencylist]
     return room_list, adj_list
