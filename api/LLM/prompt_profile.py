@@ -33,19 +33,20 @@ The user profile data is a dictionary containing the following keys:
 
 You will produce two outputs:
 
-1. **Room List**: A list of room types using only the following room types:
+1. **Room List**: A dictionary mapping room indexes (as strings) to room types, using only the following room types:
 ['bathroom', 'bedroom', 'diningroom', 'kitchen', 'library', 'livingroom', 'circulation', 'courtyard', 'storage', 'service']
-Format:['room_type1', 'room_type2', 'room_type3', ...]
+Format:{'0': 'room_type1', '1': 'room_type2', '2': 'room_type3', ...}
 
-2. **Adjacency List**: A list of adjacency connections represented as tuples of room indexes (based on the positions in the room list, starting from index 0).
+2. **Adjacency List**: A list of adjacency connections represented as tuples of room indexes (as integers), based on the room list.
 Format:[(room_index1, room_index2), (room_index3, room_index4), ...]
 
+*Important*: You must only use room types from the predefined list. Do not add any new room types or variations.
 
 -- Follow These Steps:
 
 **Step 1: Determine Headcounts and Basic Room Requirements**
 
-- Use 'familyInfoPrompt' and 'userPersona' to decide the number of occupants.
+- Analyze 'familyInfoPrompt' and 'userPersona' to decide the number of occupants.
 
 - Based on the headcount, determine the necessary number of bedrooms and bathrooms.
 
@@ -75,18 +76,22 @@ Format:[(room_index1, room_index2), (room_index3, room_index4), ...]
 
 - **'service'**: Include if specified or inferred from the user's needs.
 
-- Generate a complete room list by adding the additional rooms to the basic room list from Step 1. For example:['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'circulation']
+- Generate a complete room list by adding the additional rooms to the basic room list from Step 1. 
 
+**Step 3: Assign Room Indexes and Prepare Room List**
 
-**Step 3: Determine Room Adjacency**
+-Assign an index to each room starting from '0', incrementing by '1'.
+-Create the Room List as a dictionary mapping indexes (as strings) to room types.
+
+**Step 4: Determine Room Adjacency**
 
 - Use the information from 'socialInfoPrompt' and other profile data to decide which rooms should be adjacent.
 
 - Ensure logical and functional connectivity between rooms (e.g., kitchen adjacent to dining room, public spaces like living room should have access to other rooms).
 
-- Represent each adjacency as a tuple of room indexes. For example:[(0,3), (1,4), (2,4), (0,5), (1,5), (2,5), (5,6), (6,7), (7,8)]
+- Represent each adjacency as a tuple of room indexes (as integers), based on their positions in the room list.
 
-**Step 4: Output the Room List and Adjacency List**
+**Step 5: Output the Room List and Adjacency List**
 
 - Present your final output exactly in the formats specified under the Output Data Schema.
 
@@ -125,22 +130,48 @@ Step2: Infer Additional Rooms
 - Updated Room List:
   ['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'storage', 'circulation']
 
-Step3: Determine Room Adjacency
+Step 3: Assign Room Indexes
+{
+  '0': 'bedroom',
+  '1': 'bedroom',
+  '2': 'bedroom',
+  '3': 'bathroom',
+  '4': 'bathroom',
+  '5': 'livingroom',
+  '6': 'kitchen',
+  '7': 'diningroom',
+  '8': 'storage',
+  '9': 'circulation'
+}
 
-- Adjacency List:
+Step4: Determine Room Adjacency
+
   - Bedrooms (0,1,2) connected to circulation (9): (0,9), (1,9), (2,9)
   - Bathrooms (3,4) connected to circulation (9): (3,9), (4,9)
   - Livingroom (5) connected to circulation (9), kitchen (6), diningroom (7): (5,9), (5,6), (5,7)
   - Kitchen (6) connected to diningroom (7): (6,7)
   - Storage (8) connected to circulation (9): (8,9)
+  - Adjacency List: [(0, 9), (1, 9), (2, 9), (3, 9), (4, 9), (5, 9), (5, 6), (5, 7), (6, 7), (8, 9)]
 
-Step4: Output the Room List and Adjacency List
+Step5: Output the Room List and Adjacency List
 
 {
-  'Room List':
-    ['bedroom', 'bedroom', 'bedroom', 'bathroom', 'bathroom', 'livingroom', 'kitchen', 'diningroom', 'storage', 'circulation'],
-  'Adjacency List':
-    [(0,9), (1,9), (2,9), (3,9), (4,9), (5,9), (5,6), (5,7), (6,7), (8,9)]
+  "Room List": {
+    "0": "bedroom",
+    "1": "bedroom",
+    "2": "bedroom",
+    "3": "bathroom",
+    "4": "bathroom",
+    "5": "livingroom",
+    "6": "kitchen",
+    "7": "diningroom",
+    "8": "storage",
+    "9": "circulation"
+  },
+  "Adjacency List": [
+    (0, 9), (1, 9), (2, 9), (3, 9), (4, 9),
+    (5, 9), (5, 6), (5, 7), (6, 7), (8, 9)
+  ]
 }
 ---
 """
@@ -160,8 +191,8 @@ Output:
 Step1: Determine Headcounts and Basic Room Requirements
 
 - Total occupants: 1 person.
-- Bedrooms: Assume 1.
-- Bathrooms: Assume 1.
+- Bedrooms: Assume 1 (since 'bedroomNum' is None).
+- Bathrooms: Assume 1 (since 'bedroomNum' is None).
 - Basic Room List:
   ['bedroom', 'bathroom']
 
@@ -174,20 +205,35 @@ Step2: Infer Additional Rooms
 - Updated Room List:
   ['bedroom', 'bathroom', 'livingroom', 'kitchen', 'library', 'circulation']
 
-Step3: Determine Room Adjacency
+Step3: Assign Room Indexes
+{
+  '0': 'bedroom',
+  '1': 'bathroom',
+  '2': 'livingroom',
+  '3': 'kitchen',
+  '4': 'library',
+  '5': 'circulation'
+}
 
-- Adjacency List:
+Step4: Determine Room Adjacency
   - Bedroom (0) connected to circulation (5): (0,5)
   - Bathroom (1) connected to circulation (5): (1,5)
   - Livingroom (2) connected to circulation (5), kitchen (3), library (4): (2,5), (2,3), (2,4)
-
-Step4: Output the Room List and Adjacency List
-
+  - Adjacency List:[(0, 5), (1, 5), (2, 5), (2, 3), (2, 4)]
+  
+Step5: Output the Room List and Adjacency List
 {
-  'Room List':
-    ['bedroom', 'bathroom', 'livingroom', 'kitchen', 'library', 'circulation'],
-  'Adjacency List':
-    [(0,5), (1,5), (2,5), (2,3), (2,4)]
+  "Room List": {
+    "0": "bedroom",
+    "1": "bathroom",
+    "2": "livingroom",
+    "3": "kitchen",
+    "4": "library",
+    "5": "circulation"
+  },
+  "Adjacency List": [
+    (0, 5), (1, 5), (2, 5), (2, 3), (2, 4)
+  ]
 }
 ---"""
 

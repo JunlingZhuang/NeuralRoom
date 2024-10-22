@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Tuple
+from typing import Dict, List
 from LLM.prompt_basic import make_basic_input_prompt, make_basic_sysprompt
 from LLM.prompt_profile import make_profile_sysprompt
 from openai import OpenAI
@@ -12,7 +12,7 @@ class RoomAdjacency(BaseModel):
 
 
 class RoomGraph(BaseModel):
-    roomlist: List[str]
+    roomlist: Dict[str, str]
     adjacencylist: List[RoomAdjacency]
 
 
@@ -20,7 +20,8 @@ class OutputGraph(BaseModel):
     step1: str
     step2: str
     step3: str
-    step4: RoomGraph
+    step4: str
+    step5: RoomGraph
 
 
 def process_LLM_output(classes_dict, rel_dict, LLM_output=None):
@@ -36,9 +37,9 @@ def process_LLM_output(classes_dict, rel_dict, LLM_output=None):
 
     """
 
-    room_graph = LLM_output.step4
+    room_graph = LLM_output.step5
     room_str_list = room_graph.roomlist
-    room_list = [classes_dict[rm] for rm in room_str_list]
+    room_list = [classes_dict[rm] for rm in room_str_list.values()]
     adj_id = rel_dict.get("adjacent to")
     adj_list = [[adj.room1, adj_id, adj.room2] for adj in room_graph.adjacencylist]
     return room_list, adj_list
