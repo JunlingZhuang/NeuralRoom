@@ -215,11 +215,35 @@ export const createGraphManager = (): GraphManager => {
       Edges: [...prevGraph.Edges, edge], // update edges list
     }));
   };
+
   const deleteEdge = (edgeToDelete: Edge) => {
-    setGraph((prevGraph) => ({
-      ...prevGraph,
-      Edges: prevGraph.Edges.filter((edge) => edge !== edgeToDelete),
-    }));
+    console.log("Deleting edge in graphManager:", edgeToDelete);
+    setGraph((prevGraph) => {
+      const newEdges = prevGraph.Edges.filter(
+        (edge) =>
+          !(
+            edge.source.id === edgeToDelete.source.id &&
+            edge.target.id === edgeToDelete.target.id &&
+            edge.type === edgeToDelete.type
+          )
+      );
+      const newNodes = cleanNodeWithoutEdgesConnected(prevGraph.Nodes, newEdges);
+      console.log("New edges after filter:", newEdges);
+      return {
+        Nodes: newNodes,
+        Edges: newEdges,
+      };
+    });
+  };
+
+  const cleanNodeWithoutEdgesConnected = (nodes: Node[], edges: Edge[]) => {
+    return nodes.filter((node) => {
+      return edges.some((edge) => {
+        return (
+          edge.source.id === node.id || edge.target.id === node.id
+        );
+      });
+    });
   };
 
   return {

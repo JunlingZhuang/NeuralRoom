@@ -59,6 +59,8 @@ export default function GraphCanvas() {
       .attr("width", "100%")
       .attr("height", "100%");
 
+    const svgRect = svg.node()!.getBoundingClientRect();
+
     const nodeTooltip = d3
       .select("body")
       .append("div")
@@ -77,33 +79,83 @@ export default function GraphCanvas() {
 
     const link = svg.selectAll("g").data(edgesData).enter().append("g");
 
-    const actualLine = link
-      .append("line")
-      .style("stroke", "grey")
-      .style("stroke-width", 1);
-
     link
       .append("line")
-      .style("stroke", "transparent")
-      .style("stroke-width", 10)
-      .on("mouseover", function () {
-        const previousLine = this.previousSibling as Element | null;
-        if (previousLine) {
-          d3.select(previousLine)
-            .transition()
-            .duration(edgeTransition)
-            .style("stroke", "white")
-            .style("stroke-width", 1.5);
-        }
+      .attr("class", "edge-line")
+      .style("stroke", "grey")
+      .style("stroke-width", 3)
+      .style("pointer-events", "all")
+      .style("z-index", 1)
+      .on("mouseover", function (event, d) {
+        // high light the line
+        d3.select(this)
+          .transition()
+          .duration(edgeTransition)
+          .style("stroke", "white")
+          .style("stroke-width", 10)
+          .style("pointer-events", "all")
+          .style("cursor", "pointer");
+        
+        //  add text to parent element
+        const textOffset = 12;
+        const parentElement = this.parentNode as SVGGElement;
+        const parentG = d3.select(parentElement);
+        parentG.append("text")
+          .attr("x", (d: any) => {
+            const sourceX = (d.source as NodeWithCoords).x || 0;
+            const targetX = (d.target as NodeWithCoords).x || 0;
+            const midX = (sourceX + targetX) / 2;
+            // Calculate perpendicular offset
+            const dx = ((d.target as NodeWithCoords).x || 0) - ((d.source as NodeWithCoords).x || 0);
+            const dy = ((d.target as NodeWithCoords).y || 0) - ((d.source as NodeWithCoords).y || 0);
+            const length = Math.sqrt(dx * dx + dy * dy);
+            // Use the perpendicular vector (-dy, dx)
+            return midX + (dy / length) * textOffset;
+          })
+          .attr("y", (d: any) => {
+            const sourceY = (d.source as NodeWithCoords).y || 0;
+            const targetY = (d.target as NodeWithCoords).y || 0;
+            const midY = (sourceY + targetY) / 2;
+            // Calculate perpendicular offset
+            const dx = ((d.target as NodeWithCoords).x || 0) - ((d.source as NodeWithCoords).x || 0);
+            const dy = ((d.target as NodeWithCoords).y || 0) - ((d.source as NodeWithCoords).y || 0);
+            const length = Math.sqrt(dx * dx + dy * dy);
+            // Use the perpendicular vector (-dy, dx)
+            return midY - (dx / length) * textOffset;
+          })
+          .style("text-anchor", "middle")
+          .style("dominant-baseline", "middle")
+          .style("fill", "white")
+          .style("font-size", "10px")
+          .style("pointer-events", "none")
+          .style("opacity", 1)
+          .text("✕");
+      })
+      .on("click", function (event: any, d: Edge) {
+        event.stopPropagation();
+        event.preventDefault();
+        console.log("Delete button clicked");
+        console.log("Edge to delete:", d);
+        console.log("Current edges before deletion:", graphManager.graph.Edges);
+        graphManager.deleteEdge(d);
+        console.log("Current edges after deletion:", graphManager.graph.Edges);
+        
+        // Force simulation update
+        simulationRef.current?.nodes(graphManager.graph.Nodes as d3.SimulationNodeDatum[]);
+        (simulationRef.current?.force("link") as d3.ForceLink<any, any>).links(graphManager.graph.Edges);
+        simulationRef.current?.alpha(1).restart();
       })
       .on("mouseout", function () {
-        const previousLine = this.previousSibling as Element | null;
-        if (previousLine) {
-          d3.select(previousLine)
-            .transition()
-            .duration(edgeTransition)
-            .style("stroke", "grey")
-            .style("stroke-width", 1);
+        d3.select(this)
+          .transition()
+          .duration(edgeTransition)
+          .style("stroke", "grey")
+          .style("stroke-width", 3)
+          .style("cursor", "default");
+        
+        // delete text element
+        if (this.parentNode) {
+          d3.select(this.parentNode as Element).select("text").remove();
         }
       });
 
@@ -121,7 +173,7 @@ export default function GraphCanvas() {
           .on("end", (event, d) => dragended(event, d))
       );
     const actualNodeRadius = 8;
-    const displayNodeRadius = 12;
+    const displayNodeRadius = 10;
 
     const actualNode = node
       .append("circle")
@@ -146,8 +198,8 @@ export default function GraphCanvas() {
         nodeTooltip.transition().duration(200).style("opacity", 0.9);
         nodeTooltip
           .html(`ID: ${d.id}<br/>Program: ${d.programName}`)
-          .style("left", `${event.pageX}px`)
-          .style("top", `${event.pageY - 40}px`);
+          .style("left", `${(d.x || 0) + svgRect.left + 40}px`)
+          .style("top", `${(d.y || 0) + svgRect.top - 40}px`);
       })
       .on("mouseout", function () {
         const previousNode = this.previousSibling as Element | null;
